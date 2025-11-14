@@ -1,0 +1,30 @@
+name: adblock_engine
+version: 0.1.0
+type: library
+level: 1
+description: Ad blocking filter engine using EasyList
+language: rust
+framework: cargo
+entry_point: src/lib.rs
+test_framework: cargo-test
+token_budget:
+  estimated: 8000
+  optimal: 70000
+  warning: 90000
+  hard_limit: 110000
+dependencies:
+  imports:
+  - name: shared_types
+    version: ^0.1.0
+    import_from: components.shared_types
+    uses: []
+  - name: message_bus
+    version: ^0.1.0
+    import_from: components.message_bus
+    uses: []
+quality_gates:
+  min_test_coverage: 80
+  enforce_tdd: true
+  clippy_required: true
+  fmt_required: true
+user_facing_features: []

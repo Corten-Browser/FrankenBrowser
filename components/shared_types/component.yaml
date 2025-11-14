@@ -1,0 +1,22 @@
+name: shared_types
+version: 0.1.0
+type: library
+level: 0
+description: Common types, messages, and error definitions
+language: rust
+framework: cargo
+entry_point: src/lib.rs
+test_framework: cargo-test
+token_budget:
+  estimated: 5000
+  optimal: 70000
+  warning: 90000
+  hard_limit: 110000
+dependencies:
+  imports: []
+quality_gates:
+  min_test_coverage: 80
+  enforce_tdd: true
+  clippy_required: true
+  fmt_required: true
+user_facing_features: []

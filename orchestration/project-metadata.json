@@ -1,0 +1,14 @@
+{
+  "project_name": "FrankenBrowser",
+  "version": "0.1.0",
+  "lifecycle_state": "pre-release",
+  "api_locked": false,
+  "breaking_changes_policy": "encouraged",
+  "language": "rust",
+  "description": "Minimal viable browser combining existing Rust components for rapid prototype",
+  "repository": "https://github.com/Corten-Browser/FrankenBrowser",
+  "authors": ["Browser Team"],
+  "license": "MIT OR Apache-2.0",
+  "created_at": "2025-11-14",
+  "last_updated": "2025-11-14"
+}

@@ -1,0 +1,102 @@
+[
+  {
+    "name": "shared_types",
+    "type": "library",
+    "level": 0,
+    "description": "Common types, messages, and error definitions",
+    "dependencies": [],
+    "token_estimate": 5000
+  },
+  {
+    "name": "message_bus",
+    "type": "library",
+    "level": 0,
+    "description": "Message bus implementation for component communication",
+    "dependencies": [
+      "shared_types"
+    ],
+    "token_estimate": 8000
+  },
+  {
+    "name": "config_manager",
+    "type": "library",
+    "level": 1,
+    "description": "Configuration loading, saving, and management",
+    "dependencies": [
+      "shared_types"
+    ],
+    "token_estimate": 6000
+  },
+  {
+    "name": "network_stack",
+    "type": "library",
+    "level": 1,
+    "description": "HTTP client, request handling, cache, and cookies",
+    "dependencies": [
+      "shared_types",
+      "message_bus"
+    ],
+    "token_estimate": 12000
+  },
+  {
+    "name": "adblock_engine",
+    "type": "library",
+    "level": 1,
+    "description": "Ad blocking filter engine using EasyList",
+    "dependencies": [
+      "shared_types",
+      "message_bus"
+    ],
+    "token_estimate": 8000
+  },
+  {
+    "name": "browser_core",
+    "type": "library",
+    "level": 2,
+    "description": "Browser engine, navigation, history, and bookmarks",
+    "dependencies": [
+      "shared_types",
+      "message_bus",
+      "network_stack",
+      "config_manager"
+    ],
+    "token_estimate": 10000
+  },
+  {
+    "name": "webview_integration",
+    "type": "library",
+    "level": 2,
+    "description": "WebView wrapper with platform-specific implementations",
+    "dependencies": [
+      "shared_types",
+      "message_bus"
+    ],
+    "token_estimate": 12000
+  },
+  {
+    "name": "browser_shell",
+    "type": "library",
+    "level": 3,
+    "description": "Window and tab management, UI shell",
+    "dependencies": [
+      "shared_types",
+      "message_bus",
+      "config_manager",
+      "network_stack",
+      "adblock_engine",
+      "browser_core",
+      "webview_integration"
+    ],
+    "token_estimate": 14000
+  },
+  {
+    "name": "cli_app",
+    "type": "application",
+    "level": 4,
+    "description": "Main application entry point and wiring",
+    "dependencies": [
+      "browser_shell"
+    ],
+    "token_estimate": 3000
+  }
+]

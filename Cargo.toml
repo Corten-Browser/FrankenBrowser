@@ -1,0 +1,63 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "components/shared_types",
+    "components/message_bus",
+    "components/config_manager",
+    "components/network_stack",
+    "components/adblock_engine",
+    "components/browser_core",
+    "components/webview_integration",
+    "components/browser_shell",
+    "components/cli_app",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Browser Team"]
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+# Shared dependencies across workspace
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+tokio = { version = "1.35", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# Networking
+reqwest = { version = "0.11", features = ["blocking", "cookies", "gzip", "brotli", "json", "stream"] }
+url = "2.5"
+cookie_store = "0.20"
+
+# Ad blocking
+adblock = "0.8"
+
+# Database
+rusqlite = { version = "0.30", features = ["bundled"] }
+
+# IPC
+crossbeam-channel = "0.5"
+
+# UI
+wry = "0.35"
+tao = "0.25"
+egui = "0.24"
+eframe = "0.24"
+
+# Config
+toml = "0.8"
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
