@@ -11,6 +11,7 @@ members = [
     "components/webview_integration",
     "components/browser_shell",
     "components/cli_app",
+    "integration_tests",
 ]
 
 [workspace.package]

@@ -1,0 +1,40 @@
+[package]
+name = "integration_tests"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+# Import all components for integration testing
+shared-types = { path = "../components/shared_types" }
+message-bus = { path = "../components/message_bus" }
+config-manager = { path = "../components/config_manager" }
+network-stack = { path = "../components/network_stack" }
+adblock-engine = { path = "../components/adblock_engine" }
+browser-core = { path = "../components/browser_core" }
+
+# Testing dependencies
+url = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[[test]]
+name = "message_bus_integration"
+path = "tests/test_message_bus_integration.rs"
+
+[[test]]
+name = "network_integration"
+path = "tests/test_network_integration.rs"
+
+[[test]]
+name = "adblock_integration"
+path = "tests/test_adblock_integration.rs"
+
+[[test]]
+name = "complete_workflows"
+path = "tests/test_complete_workflows.rs"
+
+[[test]]
+name = "api_compatibility"
+path = "tests/test_api_compatibility.rs"
