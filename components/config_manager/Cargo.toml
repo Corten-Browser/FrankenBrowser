@@ -8,11 +8,14 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 shared-types = { path = "../shared_types" }
 serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
 anyhow = "1.0"
 thiserror = "1.0"
+shellexpand = "3.1"
 
 [dev-dependencies]
 tokio = { version = "1.35", features = ["test-util", "macros"] }
+tempfile = "3.8"
 
 [lib]
 path = "src/lib.rs"
