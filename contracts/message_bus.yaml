@@ -1,0 +1,88 @@
+component: message_bus
+version: 0.1.0
+description: Message bus for component communication
+language: rust
+depends_on:
+  - shared_types
+
+exports:
+  traits:
+    - name: MessageSender
+      methods:
+        - name: send
+          signature: "&self, message: BrowserMessage -> Result<()>"
+          description: Send a message to the message bus
+          error_conditions:
+            - Bus shutdown
+            - Channel disconnected
+
+    - name: MessageHandler
+      methods:
+        - name: handle
+          signature: "&self, message: BrowserMessage -> Result<()>"
+          description: Handle a received message
+          error_conditions:
+            - Processing error
+            - Invalid message
+
+  structs:
+    - name: MessageBus
+      methods:
+        - name: new
+          signature: "() -> Self"
+          description: Create a new message bus
+
+        - name: sender
+          signature: "&self -> Box<dyn MessageSender>"
+          description: Get a message sender for this bus
+
+        - name: register_handler
+          signature: "&mut self, handler: Box<dyn MessageHandler>"
+          description: Register a message handler
+
+        - name: start
+          signature: "&mut self -> Result<()>"
+          description: Start processing messages
+          error_conditions:
+            - Already started
+            - Channel creation failed
+
+        - name: shutdown
+          signature: "&mut self -> Result<()>"
+          description: Shutdown the message bus
+          error_conditions:
+            - Already shutdown
+
+usage_examples:
+  - name: Creating and using message bus
+    code: |
+      let mut bus = MessageBus::new();
+      let sender = bus.sender();
+
+      bus.start()?;
+
+      sender.send(BrowserMessage::NavigateRequest {
+          tab_id: 1,
+          url: Url::parse("https://example.com")?
+      })?;
+
+      bus.shutdown()?;
+
+  - name: Registering a handler
+    code: |
+      struct MyHandler;
+
+      impl MessageHandler for MyHandler {
+          fn handle(&self, message: BrowserMessage) -> Result<()> {
+              match message {
+                  BrowserMessage::NavigateRequest { tab_id, url } => {
+                      println!("Navigate to {}", url);
+                      Ok(())
+                  }
+                  _ => Ok(())
+              }
+          }
+      }
+
+      let mut bus = MessageBus::new();
+      bus.register_handler(Box::new(MyHandler));

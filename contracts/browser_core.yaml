@@ -1,0 +1,98 @@
+component: browser_core
+version: 0.1.0
+description: Browser engine with navigation, history, and bookmarks
+language: rust
+depends_on:
+  - shared_types
+  - message_bus
+  - network_stack
+  - config_manager
+
+exports:
+  structs:
+    - name: BrowserEngine
+      methods:
+        - name: new
+          signature: "(config: Config, network: NetworkStack, message_bus: Box<dyn MessageSender>) -> Result<Self>"
+          description: Create a new browser engine
+
+        - name: navigate
+          signature: "(&mut self, tab_id: u32, url: Url) -> Result<()>"
+          description: Navigate to a URL
+          error_conditions:
+            - Invalid tab_id
+            - Network error
+            - Invalid URL
+
+        - name: go_back
+          signature: "(&mut self, tab_id: u32) -> Result<()>"
+          description: Navigate back in history
+          error_conditions:
+            - Invalid tab_id
+            - No history
+
+        - name: go_forward
+          signature: "(&mut self, tab_id: u32) -> Result<()>"
+          description: Navigate forward in history
+          error_conditions:
+            - Invalid tab_id
+            - No forward history
+
+        - name: reload
+          signature: "(&mut self, tab_id: u32) -> Result<()>"
+          description: Reload current page
+          error_conditions:
+            - Invalid tab_id
+            - No current page
+
+        - name: add_bookmark
+          signature: "(&mut self, url: Url, title: String) -> Result<()>"
+          description: Add a bookmark
+          error_conditions:
+            - Database error
+
+        - name: get_bookmarks
+          signature: "(&self) -> Vec<Bookmark>"
+          description: Get all bookmarks
+
+        - name: get_history
+          signature: "(&self) -> Vec<HistoryEntry>"
+          description: Get browsing history
+
+  types:
+    - name: Bookmark
+      fields:
+        - id: i64
+        - url: String
+        - title: String
+        - created_at: i64
+
+    - name: HistoryEntry
+      fields:
+        - id: i64
+        - url: String
+        - title: String
+        - visit_count: i32
+        - last_visit: i64
+
+usage_examples:
+  - name: Basic navigation
+    code: |
+      let mut engine = BrowserEngine::new(config, network, message_bus)?;
+
+      engine.navigate(1, Url::parse("https://example.com")?)?;
+      engine.go_back(1)?;
+      engine.go_forward(1)?;
+      engine.reload(1)?;
+
+  - name: Managing bookmarks
+    code: |
+      engine.add_bookmark(
+          Url::parse("https://example.com")?,
+          "Example Site".to_string()
+      )?;
+
+      let bookmarks = engine.get_bookmarks();
+      for bookmark in bookmarks {
+          println!("{}: {}", bookmark.title, bookmark.url);
+      }

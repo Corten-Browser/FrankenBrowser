@@ -1,0 +1,102 @@
+component: shared_types
+version: 0.1.0
+description: Common types and messages for FrankenBrowser components
+language: rust
+
+exports:
+  enums:
+    - name: BrowserMessage
+      variants:
+        - NavigateRequest:
+            fields:
+              - tab_id: u32
+              - url: Url
+        - NavigateResponse:
+            fields:
+              - tab_id: u32
+              - content: Vec<u8>
+        - NavigateError:
+            fields:
+              - tab_id: u32
+              - error: String
+        - HttpRequest:
+            fields:
+              - request_id: u64
+              - url: Url
+              - headers: HashMap<String, String>
+        - HttpResponse:
+            fields:
+              - request_id: u64
+              - status: u16
+              - body: Vec<u8>
+        - ShouldBlock:
+            fields:
+              - url: Url
+              - resource_type: ResourceType
+        - BlockDecision:
+            fields:
+              - block: bool
+              - reason: Option<String>
+        - CreateTab:
+            fields:
+              - parent_window: u32
+        - CloseTab:
+            fields:
+              - tab_id: u32
+        - SwitchTab:
+            fields:
+              - tab_id: u32
+        - Shutdown: {}
+        - Reload:
+            fields:
+              - tab_id: u32
+        - GoBack:
+            fields:
+              - tab_id: u32
+        - GoForward:
+            fields:
+              - tab_id: u32
+
+    - name: ResourceType
+      variants:
+        - Document
+        - Script
+        - Image
+        - Stylesheet
+        - Font
+        - Media
+        - Websocket
+        - Xhr
+        - Other
+
+  types:
+    - name: TabId
+      type: u32
+
+    - name: RequestId
+      type: u64
+
+  traits:
+    - name: Send
+      required: true
+      note: All types must be Send for thread safety
+
+    - name: Sync
+      required: true
+      note: All types must be Sync for thread safety
+
+usage_examples:
+  - name: Creating a navigate request
+    code: |
+      let msg = BrowserMessage::NavigateRequest {
+          tab_id: 1,
+          url: Url::parse("https://example.com").unwrap()
+      };
+
+  - name: Handling resource type
+    code: |
+      match resource_type {
+          ResourceType::Script => { /* block scripts */ },
+          ResourceType::Image => { /* allow images */ },
+          _ => { /* default handling */ }
+      }

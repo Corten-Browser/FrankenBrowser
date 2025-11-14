@@ -1,0 +1,25 @@
+[browser]
+homepage = "https://www.google.com"
+enable_devtools = true
+default_search_engine = "google"
+
+[network]
+max_connections_per_host = 6
+timeout_seconds = 30
+enable_cookies = true
+enable_cache = true
+cache_size_mb = 500
+
+[adblock]
+enabled = true
+update_filters_on_startup = false
+custom_filters = []
+
+[privacy]
+do_not_track = true
+clear_cookies_on_exit = false
+block_third_party_cookies = false
+
+[appearance]
+theme = "auto"  # "light", "dark", "auto"
+default_zoom = 1.0
