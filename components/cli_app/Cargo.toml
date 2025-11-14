@@ -7,6 +7,12 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 browser-shell = { path = "../browser_shell" }
+browser-core = { path = "../browser_core" }
+network-stack = { path = "../network_stack" }
+adblock-engine = { path = "../adblock_engine" }
+message-bus = { path = "../message_bus" }
+config-manager = { path = "../config_manager" }
+shared-types = { path = "../shared_types" }
 serde = { version = "1.0", features = ["derive"] }
 anyhow = "1.0"
 thiserror = "1.0"
@@ -19,3 +25,7 @@ tokio = { version = "1.35", features = ["test-util", "macros"] }
 
 [lib]
 path = "src/lib.rs"
+
+[[bin]]
+name = "frankenbrowser"
+path = "src/main.rs"
