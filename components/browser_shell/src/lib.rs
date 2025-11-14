@@ -1,15 +1,15 @@
 //! Window and tab management, UI shell
 //!
 //! This is the browser_shell component of the FrankenBrowser project.
-//! 
+//!
 //! # Component Overview
-//! 
+//!
 //! **Type**: library
-//! **Level**: 3
+//! **Level**: 3 (integration level)
 //! **Token Budget**: 14000 tokens
-//! 
+//!
 //! # Dependencies
-//! 
+//!
 //! - shared_types
 //! - message_bus
 //! - config_manager
@@ -20,33 +20,44 @@
 //!
 //! # Usage
 //!
-//! See README.md and CLAUDE.md for detailed usage and development instructions.
+//! ```rust
+//! use browser_shell::BrowserShell;
+//! use config_manager::ShellConfig;
+//! use message_bus::MessageBus;
+//! use std::sync::Arc;
+//! use tokio::runtime::Runtime;
+//!
+//! let config = ShellConfig {
+//!     homepage: "https://www.example.com".to_string(),
+//!     enable_devtools: true,
+//!     theme: "light".to_string(),
+//!     default_zoom: 1.0,
+//! };
+//!
+//! let mut bus = MessageBus::new();
+//! bus.start().unwrap();
+//! let sender = bus.sender();
+//! let runtime = Arc::new(Runtime::new().unwrap());
+//!
+//! let mut shell = BrowserShell::new(config, sender, runtime).unwrap();
+//!
+//! // Create tabs
+//! let tab1 = shell.create_tab().unwrap();
+//! let tab2 = shell.create_tab().unwrap();
+//!
+//! // Switch tabs
+//! shell.switch_to_tab(tab2).unwrap();
+//!
+//! // Get tab count
+//! assert_eq!(shell.get_tab_count(), 2);
+//!
+//! // Run the shell (in headless mode, this is a no-op)
+//! shell.run().unwrap();
+//! ```
 
-// Placeholder implementation
-// The actual implementation will be added by the component agent
+pub mod errors;
+pub mod types;
 
-pub mod errors {{
-    //! Error types for this component
-    
-    use thiserror::Error;
-    
-    #[derive(Error, Debug)]
-    pub enum Error {{
-        #[error("Not implemented yet")]
-        NotImplemented,
-    }}
-    
-    pub type Result<T> = std::result::Result<T, Error>;
-}}
-
-#[cfg(test)]
-mod tests {{
-    use super::*;
-
-    #[test]
-    fn test_placeholder() {{
-        // Placeholder test
-        // Real tests will be added during TDD implementation
-        assert_eq!(2 + 2, 4);
-    }}
-}}
+// Re-export main types for convenience
+pub use errors::{Error, Result};
+pub use types::{BrowserShell, Tab};
