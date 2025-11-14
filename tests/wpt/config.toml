@@ -1,0 +1,49 @@
+# Web Platform Tests (WPT) Configuration
+# Phase 1 target: 40% pass rate using existing components
+
+[wpt]
+# Path to WPT repository (clone from https://github.com/web-platform-tests/wpt.git)
+test_path = "../../../wpt"
+
+# Path to FrankenBrowser binary
+binary_path = "../../target/release/frankenstein-browser"
+
+# Test subsets to run in Phase 1
+# These are basic tests that should work with existing WebView components
+test_subsets = [
+    "html/browsers/browsing-the-web/navigating-across-documents",
+    "html/browsers/history",
+    "fetch/api/basic",
+    "dom/events",
+    "html/semantics",
+]
+
+# Expected pass rate for Phase 1 (using WebView + existing components)
+expected_pass_rate = 0.40  # 40%
+
+# Timeout configuration
+[wpt.timeouts]
+default = 30000          # 30 seconds default timeout
+long = 60000            # 60 seconds for long tests
+
+# Test filtering
+[wpt.filters]
+# Skip tests that require features not in Phase 1
+skip_patterns = [
+    "service-workers",   # Not supported in Phase 1
+    "web-workers",       # Limited support
+    "websockets",        # Future phase
+    "webrtc",            # Future phase
+]
+
+# Test execution
+[wpt.execution]
+parallel = false         # Run tests sequentially in Phase 1
+headless = true          # Use headless mode when available
+verbose = true           # Verbose output
+
+# Reporting
+[wpt.reporting]
+output_format = "json"
+output_path = "tests/wpt/results"
+generate_html = true

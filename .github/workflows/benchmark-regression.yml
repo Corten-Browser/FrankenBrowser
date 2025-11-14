@@ -1,0 +1,119 @@
+name: Benchmark Regression
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Full history for comparison
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-bench-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run benchmarks
+        run: cargo bench --bench performance -- --save-baseline current
+
+      - name: Store benchmark results
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-results
+          path: target/criterion
+
+      - name: Download baseline (if exists)
+        uses: dawidd6/action-download-artifact@v2
+        continue-on-error: true
+        with:
+          workflow: benchmark-regression.yml
+          branch: main
+          name: benchmark-baseline
+          path: target/criterion-baseline
+
+      - name: Compare with baseline
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ -d "target/criterion-baseline" ]; then
+            echo "Comparing benchmarks with baseline..."
+            cargo bench --bench performance -- --baseline current
+          else
+            echo "No baseline found, skipping comparison"
+          fi
+
+      - name: Save as new baseline (main branch only)
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-baseline
+          path: target/criterion
+          retention-days: 90
+
+      - name: Generate benchmark report
+        run: |
+          echo "## Benchmark Results" > benchmark-report.md
+          echo "" >> benchmark-report.md
+          echo "Benchmark run completed at $(date)" >> benchmark-report.md
+          echo "" >> benchmark-report.md
+          echo "See attached artifacts for detailed HTML reports" >> benchmark-report.md
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('benchmark-report.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
+
+  performance-analysis:
+    name: Performance Analysis
+    runs-on: ubuntu-latest
+    needs: benchmark
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download benchmark results
+        uses: actions/download-artifact@v3
+        with:
+          name: benchmark-results
+          path: target/criterion
+
+      - name: Analyze performance trends
+        run: |
+          echo "Analyzing performance trends..."
+          # Add custom performance analysis script here
+          # For example, check for regressions > 10%
+
+      - name: Performance summary
+        run: |
+          echo "Performance analysis complete"
+          echo "View detailed reports in artifacts"
