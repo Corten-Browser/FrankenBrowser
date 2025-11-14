@@ -11,11 +11,15 @@ message-bus = { path = "../message_bus" }
 serde = { version = "1.0", features = ["derive"] }
 anyhow = "1.0"
 thiserror = "1.0"
-wry = "0.35"
-tao = "0.25"
+wry = { version = "0.35", optional = true }
+tao = { version = "0.25", optional = true }
 
 [dev-dependencies]
 tokio = { version = "1.35", features = ["test-util", "macros"] }
+
+[features]
+default = []
+gui = ["wry", "tao"]
 
 [lib]
 path = "src/lib.rs"
