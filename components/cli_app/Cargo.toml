@@ -20,6 +20,10 @@ tracing = "0.1"
 tracing-subscriber = "0.3"
 tokio = { version = "1.35", features = ["full"] }
 
+[features]
+default = []
+gui = ["browser-shell/gui"]
+
 [dev-dependencies]
 tokio = { version = "1.35", features = ["test-util", "macros"] }
 
