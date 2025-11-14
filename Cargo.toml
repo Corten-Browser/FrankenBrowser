@@ -12,6 +12,7 @@ members = [
     "components/browser_shell",
     "components/cli_app",
     "integration_tests",
+    "benchmarks",
 ]
 
 [workspace.package]
@@ -52,15 +53,6 @@ eframe = "0.24"
 
 # Config
 toml = "0.8"
-
-[workspace.dev-dependencies]
-criterion = { version = "0.5", features = ["html_reports"] }
-chrono = "0.4"
-tempfile = "3.8"
-
-[[bench]]
-name = "performance"
-harness = false
 
 [profile.dev]
 opt-level = 0

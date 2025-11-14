@@ -1,0 +1,23 @@
+[package]
+name = "benchmarks"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+publish = false
+
+[[bench]]
+name = "performance"
+harness = false
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+# Workspace dependencies needed for benchmarks
+shared-types = { path = "../components/shared_types" }
+message-bus = { path = "../components/message_bus" }
+config-manager = { path = "../components/config_manager" }
+adblock-engine = { path = "../components/adblock_engine" }
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
