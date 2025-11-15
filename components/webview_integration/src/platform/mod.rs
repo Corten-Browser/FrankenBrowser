@@ -183,7 +183,7 @@ pub fn get_webview_version() -> String {
     return linux::get_webkit_version();
 
     #[cfg(target_os = "windows")]
-    return "WebView2 (runtime version)".to_string();
+    return windows::get_webview2_version();
 
     #[cfg(target_os = "macos")]
     return "WKWebView (system version)".to_string();
