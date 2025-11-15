@@ -47,16 +47,13 @@ impl Session {
 
 /// Browser capabilities per W3C WebDriver spec
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct Capabilities {
     pub browser_name: String,
     pub browser_version: String,
     pub platform_name: String,
-    #[serde(default)]
     pub accept_insecure_certs: bool,
-    #[serde(default)]
     pub page_load_strategy: PageLoadStrategy,
-    #[serde(default)]
     pub timeouts: Timeouts,
 }
 
