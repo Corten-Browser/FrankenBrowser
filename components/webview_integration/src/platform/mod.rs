@@ -135,10 +135,12 @@ impl WebViewConfig {
         // Check cache directory exists or can be created
         if let Some(cache_dir) = &self.cache_dir {
             if !cache_dir.exists() {
-                std::fs::create_dir_all(cache_dir)
-                    .map_err(|e| crate::errors::Error::Initialization(
-                        format!("Failed to create cache directory: {}", e)
-                    ))?;
+                std::fs::create_dir_all(cache_dir).map_err(|e| {
+                    crate::errors::Error::Initialization(format!(
+                        "Failed to create cache directory: {}",
+                        e
+                    ))
+                })?;
             }
         }
 
@@ -146,10 +148,12 @@ impl WebViewConfig {
         if let Some(cookies_path) = &self.cookies_path {
             if let Some(parent) = cookies_path.parent() {
                 if !parent.exists() {
-                    std::fs::create_dir_all(parent)
-                        .map_err(|e| crate::errors::Error::Initialization(
-                            format!("Failed to create cookies directory: {}", e)
-                        ))?;
+                    std::fs::create_dir_all(parent).map_err(|e| {
+                        crate::errors::Error::Initialization(format!(
+                            "Failed to create cookies directory: {}",
+                            e
+                        ))
+                    })?;
                 }
             }
         }
@@ -216,60 +220,52 @@ mod tests {
 
     #[test]
     fn test_webview_config_builder_javascript() {
-        let config = WebViewConfig::new()
-            .with_javascript(false);
+        let config = WebViewConfig::new().with_javascript(false);
         assert!(!config.enable_javascript);
     }
 
     #[test]
     fn test_webview_config_builder_devtools() {
-        let config = WebViewConfig::new()
-            .with_devtools(true);
+        let config = WebViewConfig::new().with_devtools(true);
         assert!(config.enable_devtools);
     }
 
     #[test]
     fn test_webview_config_builder_user_agent() {
-        let config = WebViewConfig::new()
-            .with_user_agent("CustomAgent/1.0".to_string());
+        let config = WebViewConfig::new().with_user_agent("CustomAgent/1.0".to_string());
         assert_eq!(config.user_agent, Some("CustomAgent/1.0".to_string()));
     }
 
     #[test]
     fn test_webview_config_builder_cache_dir() {
         let path = PathBuf::from("/tmp/test_cache");
-        let config = WebViewConfig::new()
-            .with_cache_dir(path.clone());
+        let config = WebViewConfig::new().with_cache_dir(path.clone());
         assert_eq!(config.cache_dir, Some(path));
     }
 
     #[test]
     fn test_webview_config_builder_cookies_path() {
         let path = PathBuf::from("/tmp/test_cookies.db");
-        let config = WebViewConfig::new()
-            .with_cookies_path(path.clone());
+        let config = WebViewConfig::new().with_cookies_path(path.clone());
         assert_eq!(config.cookies_path, Some(path));
     }
 
     #[test]
     fn test_webview_config_builder_init_script() {
         let script = "console.log('init');".to_string();
-        let config = WebViewConfig::new()
-            .with_init_script(script.clone());
+        let config = WebViewConfig::new().with_init_script(script.clone());
         assert_eq!(config.init_script, Some(script));
     }
 
     #[test]
     fn test_webview_config_builder_local_storage() {
-        let config = WebViewConfig::new()
-            .with_local_storage(false);
+        let config = WebViewConfig::new().with_local_storage(false);
         assert!(!config.enable_local_storage);
     }
 
     #[test]
     fn test_webview_config_builder_webgl() {
-        let config = WebViewConfig::new()
-            .with_webgl(false);
+        let config = WebViewConfig::new().with_webgl(false);
         assert!(!config.enable_webgl);
     }
 
@@ -299,8 +295,7 @@ mod tests {
     #[test]
     fn test_webview_config_validate_with_cache_dir() {
         let temp_dir = std::env::temp_dir().join("frankenbrowser_test_cache");
-        let config = WebViewConfig::new()
-            .with_cache_dir(temp_dir.clone());
+        let config = WebViewConfig::new().with_cache_dir(temp_dir.clone());
 
         let result = config.validate();
         assert!(result.is_ok());
@@ -313,8 +308,7 @@ mod tests {
     fn test_webview_config_validate_with_cookies_path() {
         let temp_dir = std::env::temp_dir().join("frankenbrowser_test_cookies");
         let cookies_path = temp_dir.join("cookies.db");
-        let config = WebViewConfig::new()
-            .with_cookies_path(cookies_path);
+        let config = WebViewConfig::new().with_cookies_path(cookies_path);
 
         let result = config.validate();
         assert!(result.is_ok());

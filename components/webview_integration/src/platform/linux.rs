@@ -74,11 +74,7 @@ impl LinuxWebView {
         Self::initialize_webkit()?;
 
         // Build wry WebView with configuration
-        use tao::{
-            dpi::LogicalSize,
-            event_loop::EventLoop,
-            window::WindowBuilder,
-        };
+        use tao::{dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder};
         use wry::WebViewBuilder;
 
         // Create event loop (in production, browser_shell manages this)
@@ -175,10 +171,9 @@ impl LinuxWebView {
     fn setup_cookie_manager(path: PathBuf) -> Result<()> {
         // Ensure parent directory exists
         if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent)
-                .map_err(|e| Error::Initialization(
-                    format!("Failed to create cookies directory: {}", e)
-                ))?;
+            std::fs::create_dir_all(parent).map_err(|e| {
+                Error::Initialization(format!("Failed to create cookies directory: {}", e))
+            })?;
         }
 
         // Cookie management is handled by wry/WebKit2GTK
@@ -217,8 +212,8 @@ impl LinuxWebView {
         }
 
         // Parse URL to validate format
-        let _parsed_url = url::Url::parse(url)
-            .map_err(|e| Error::Navigation(format!("Invalid URL: {}", e)))?;
+        let _parsed_url =
+            url::Url::parse(url).map_err(|e| Error::Navigation(format!("Invalid URL: {}", e)))?;
 
         // Set loading state
         {
@@ -360,7 +355,9 @@ impl LinuxWebView {
     #[allow(dead_code)] // Part of platform API, tested
     fn configure_user_agent(&mut self, agent: &str) -> Result<()> {
         if agent.is_empty() {
-            return Err(Error::Initialization("User agent cannot be empty".to_string()));
+            return Err(Error::Initialization(
+                "User agent cannot be empty".to_string(),
+            ));
         }
 
         // Update config
@@ -428,8 +425,7 @@ mod tests {
     #[cfg(target_os = "linux")]
     fn test_linux_webview_new_with_cache_dir() {
         let temp_dir = std::env::temp_dir().join("frankenbrowser_test_linux");
-        let config = WebViewConfig::new()
-            .with_cache_dir(temp_dir.clone());
+        let config = WebViewConfig::new().with_cache_dir(temp_dir.clone());
 
         let result = LinuxWebView::new(config);
         assert!(result.is_ok());
@@ -443,8 +439,7 @@ mod tests {
     fn test_linux_webview_new_with_cookies() {
         let temp_dir = std::env::temp_dir().join("frankenbrowser_test_cookies_linux");
         let cookies_path = temp_dir.join("cookies.db");
-        let config = WebViewConfig::new()
-            .with_cookies_path(cookies_path);
+        let config = WebViewConfig::new().with_cookies_path(cookies_path);
 
         let result = LinuxWebView::new(config);
         assert!(result.is_ok());
@@ -457,8 +452,7 @@ mod tests {
     #[cfg(target_os = "linux")]
     fn test_linux_webview_new_with_init_script() {
         let init_script = "console.log('WebView initialized');".to_string();
-        let config = WebViewConfig::new()
-            .with_init_script(init_script);
+        let config = WebViewConfig::new().with_init_script(init_script);
 
         let result = LinuxWebView::new(config);
         assert!(result.is_ok());
@@ -476,7 +470,10 @@ mod tests {
 
         let result = webview.navigate("https://example.com");
         assert!(result.is_ok());
-        assert_eq!(webview.current_url(), Some("https://example.com".to_string()));
+        assert_eq!(
+            webview.current_url(),
+            Some("https://example.com".to_string())
+        );
     }
 
     #[test]
@@ -704,7 +701,10 @@ mod tests {
         assert!(nav_result.is_ok());
 
         // Check URL updated
-        assert_eq!(webview.current_url(), Some("https://example.com".to_string()));
+        assert_eq!(
+            webview.current_url(),
+            Some("https://example.com".to_string())
+        );
 
         // Execute script
         let script_result = webview.execute_script("console.log('test')");

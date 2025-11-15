@@ -14,8 +14,11 @@ use std::collections::HashMap;
 use std::num::NonZeroUsize;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 use url::Url;
+
+#[cfg(test)]
+use std::time::Duration;
 
 /// Cache-Control directive values
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -189,9 +192,10 @@ pub struct HttpCache {
     max_memory_bytes: usize,
     /// Current memory cache size in bytes
     current_memory_size: Arc<Mutex<usize>>,
-    /// Optional disk cache path
+    /// Optional disk cache path (reserved for future use)
+    #[allow(dead_code)]
     disk_cache_path: Option<PathBuf>,
-    /// Disk cache connection (lazy initialized)
+    /// Disk cache connection (lazy initialized, reserved for future use)
     #[allow(dead_code)]
     disk_cache: Arc<Mutex<Option<rusqlite::Connection>>>,
 }
@@ -211,11 +215,8 @@ impl HttpCache {
         let max_memory_bytes = max_memory_mb * 1024 * 1024;
         let capacity = NonZeroUsize::new(1000).unwrap();
 
-        let disk_cache = if disk_cache_path.is_some() {
-            Arc::new(Mutex::new(None)) // Lazy initialization
-        } else {
-            Arc::new(Mutex::new(None))
-        };
+        // Disk cache is lazy-initialized when needed
+        let disk_cache = Arc::new(Mutex::new(None));
 
         Self {
             memory_cache: Arc::new(Mutex::new(LruCache::new(capacity))),

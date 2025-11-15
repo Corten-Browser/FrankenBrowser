@@ -6,7 +6,7 @@
 use crate::errors::{Error, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use url::Url;
 
 /// HTTP method
@@ -183,7 +183,7 @@ pub trait RequestInterceptor: Send + Sync {
 /// Note: Due to thread safety requirements, this interceptor uses a callback approach
 pub struct AdBlockInterceptor {
     /// Callback function for checking if URL should be blocked
-    should_block_fn: Option<Arc<dyn Fn(&str) -> bool + Send + Sync>>,
+    should_block_fn: Option<ShouldBlockFn>,
     /// Whether ad blocking is enabled
     enabled: bool,
 }
@@ -328,9 +328,7 @@ impl RequestInterceptor for RedirectInterceptor {
     fn pre_request(&mut self, _request: &mut Request) -> Result<()> {
         // Check if we've exceeded max redirects
         if self.redirect_count >= self.max_redirects {
-            return Err(Error::RequestFailed(
-                "Too many redirects".to_string(),
-            ));
+            return Err(Error::RequestFailed("Too many redirects".to_string()));
         }
         Ok(())
     }
@@ -546,8 +544,8 @@ mod tests {
         let mut headers = HashMap::new();
         headers.insert("Content-Type".to_string(), "text/html".to_string());
 
-        let response = Response::new(200, vec![], "req_123".to_string())
-            .with_headers(headers.clone());
+        let response =
+            Response::new(200, vec![], "req_123".to_string()).with_headers(headers.clone());
 
         assert_eq!(response.headers, headers);
     }
@@ -677,20 +675,14 @@ mod tests {
         let user_agent = "CustomBrowser/1.0".to_string();
         let interceptor = HeaderInjectorInterceptor::with_user_agent(user_agent.clone());
 
-        assert_eq!(
-            interceptor.headers.get("User-Agent"),
-            Some(&user_agent)
-        );
+        assert_eq!(interceptor.headers.get("User-Agent"), Some(&user_agent));
     }
 
     #[test]
     fn test_header_injector_with_dnt() {
         let interceptor = HeaderInjectorInterceptor::with_dnt();
 
-        assert_eq!(
-            interceptor.headers.get("DNT"),
-            Some(&"1".to_string())
-        );
+        assert_eq!(interceptor.headers.get("DNT"), Some(&"1".to_string()));
     }
 
     #[test]
@@ -704,10 +696,7 @@ mod tests {
 
         let result = interceptor.pre_request(&mut request);
         assert!(result.is_ok());
-        assert_eq!(
-            request.headers.get("X-Custom"),
-            Some(&"test".to_string())
-        );
+        assert_eq!(request.headers.get("X-Custom"), Some(&"test".to_string()));
     }
 
     #[test]
@@ -806,10 +795,7 @@ mod tests {
 
         let action = handler.process_request(&mut request).unwrap();
         assert!(matches!(action, RequestAction::Allow));
-        assert_eq!(
-            request.headers.get("X-Custom"),
-            Some(&"value".to_string())
-        );
+        assert_eq!(request.headers.get("X-Custom"), Some(&"value".to_string()));
     }
 
     #[test]

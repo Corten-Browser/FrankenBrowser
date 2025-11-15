@@ -153,10 +153,7 @@ impl NetworkStack {
         match request_action {
             RequestAction::Block { reason } => {
                 // Request was blocked by an interceptor
-                return Err(Error::RequestFailed(format!(
-                    "Request blocked: {}",
-                    reason
-                )));
+                return Err(Error::RequestFailed(format!("Request blocked: {}", reason)));
             }
             RequestAction::Redirect { url: redirect_url } => {
                 // Redirect to a different URL (recursive call)
@@ -495,18 +492,10 @@ mod tests {
             NetworkStack::parse_http_method("OPTIONS"),
             HttpMethod::OPTIONS
         );
-        assert_eq!(
-            NetworkStack::parse_http_method("PATCH"),
-            HttpMethod::PATCH
-        );
-        assert_eq!(
-            NetworkStack::parse_http_method("get"),
-            HttpMethod::GET
-        ); // Case insensitive
-        assert_eq!(
-            NetworkStack::parse_http_method("UNKNOWN"),
-            HttpMethod::GET
-        ); // Default to GET
+        assert_eq!(NetworkStack::parse_http_method("PATCH"), HttpMethod::PATCH);
+        assert_eq!(NetworkStack::parse_http_method("get"), HttpMethod::GET); // Case insensitive
+        assert_eq!(NetworkStack::parse_http_method("UNKNOWN"), HttpMethod::GET);
+        // Default to GET
     }
 
     #[tokio::test]
