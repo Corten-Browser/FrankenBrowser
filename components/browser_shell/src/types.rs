@@ -263,6 +263,9 @@ impl BrowserShell {
             self.active_tab = self.tabs.keys().next().copied();
         }
 
+        // Update UI: Remove tab from tab bar
+        let _ = self.tab_bar.remove_tab(tab_id);
+
         // Send CloseTab message
         use shared_types::BrowserMessage;
         let _ = self
@@ -287,6 +290,9 @@ impl BrowserShell {
         }
 
         self.active_tab = Some(tab_id);
+
+        // Update UI: Set active tab in tab bar
+        let _ = self.tab_bar.set_active_tab(tab_id);
 
         // Send SwitchTab message
         use shared_types::BrowserMessage;
@@ -444,6 +450,82 @@ impl BrowserShell {
         // This is a placeholder for future implementation
         let _ = self.set_menu_item_enabled("History", "Back", false);
         let _ = self.set_menu_item_enabled("History", "Forward", false);
+    }
+
+    // =================================================================
+    // UI Component Access Methods
+    // =================================================================
+
+    /// Get a reference to the URL bar
+    ///
+    /// # Returns
+    ///
+    /// Reference to the URLBar component
+    pub fn url_bar(&self) -> &crate::ui_components::URLBar {
+        &self.url_bar
+    }
+
+    /// Get a mutable reference to the URL bar
+    ///
+    /// # Returns
+    ///
+    /// Mutable reference to the URLBar component
+    pub fn url_bar_mut(&mut self) -> &mut crate::ui_components::URLBar {
+        &mut self.url_bar
+    }
+
+    /// Get a reference to the navigation buttons
+    ///
+    /// # Returns
+    ///
+    /// Reference to the NavigationButtons component
+    pub fn navigation_buttons(&self) -> &crate::ui_components::NavigationButtons {
+        &self.navigation_buttons
+    }
+
+    /// Get a mutable reference to the navigation buttons
+    ///
+    /// # Returns
+    ///
+    /// Mutable reference to the NavigationButtons component
+    pub fn navigation_buttons_mut(&mut self) -> &mut crate::ui_components::NavigationButtons {
+        &mut self.navigation_buttons
+    }
+
+    /// Get a reference to the tab bar
+    ///
+    /// # Returns
+    ///
+    /// Reference to the TabBar component
+    pub fn tab_bar(&self) -> &crate::ui_components::TabBar {
+        &self.tab_bar
+    }
+
+    /// Get a mutable reference to the tab bar
+    ///
+    /// # Returns
+    ///
+    /// Mutable reference to the TabBar component
+    pub fn tab_bar_mut(&mut self) -> &mut crate::ui_components::TabBar {
+        &mut self.tab_bar
+    }
+
+    /// Get a reference to the status bar
+    ///
+    /// # Returns
+    ///
+    /// Reference to the StatusBar component
+    pub fn status_bar(&self) -> &crate::ui_components::StatusBar {
+        &self.status_bar
+    }
+
+    /// Get a mutable reference to the status bar
+    ///
+    /// # Returns
+    ///
+    /// Mutable reference to the StatusBar component
+    pub fn status_bar_mut(&mut self) -> &mut crate::ui_components::StatusBar {
+        &mut self.status_bar
     }
 }
 
