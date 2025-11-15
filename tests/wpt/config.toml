@@ -21,6 +21,12 @@ test_subsets = [
 # Expected pass rate for Phase 1 (using WebView + existing components)
 expected_pass_rate = 0.40  # 40%
 
+# WebDriver configuration
+webdriver_port = 4444
+browser_binary = "../../target/release/frankenbrowser"
+headless = true
+timeout_seconds = 30
+
 # Timeout configuration
 [wpt.timeouts]
 default = 30000          # 30 seconds default timeout

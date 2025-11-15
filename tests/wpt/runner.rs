@@ -3,10 +3,17 @@
 /// Discovers WPT tests, filters them, executes them via WebDriver harness,
 /// and saves results to database for tracking over time.
 
-use crate::harness::{WptConfig, WptHarness, WptSuiteResults, WptTestResult};
+use super::harness::{WptConfig, WptHarness, WptSuiteResults, WptTestResult, TestStatus};
+use std::path::{Path, PathBuf};
+
+// External dependencies (from workspace)
+extern crate serde;
+extern crate regex;
+extern crate rusqlite;
+extern crate walkdir;
+
 use regex::Regex;
 use rusqlite::{Connection, params};
-use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 /// WPT Test Runner with discovery and execution logic
@@ -171,7 +178,7 @@ impl WptRunner {
         // This is a placeholder - actual implementation would parse
         // WPT testharness.js output format
         // For now, return a basic result
-        use crate::harness::TestStatus;
+        use super::harness::TestStatus;
 
         WptTestResult {
             test_name: "unknown".to_string(),
@@ -331,7 +338,6 @@ pub struct RunStatistics {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::harness::TestStatus;
 
     #[test]
     fn test_runner_creation() {

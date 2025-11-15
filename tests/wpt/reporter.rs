@@ -2,11 +2,15 @@
 ///
 /// Generates reports in multiple formats: JSON, HTML, and Console
 
-use crate::harness::{WptSuiteResults, WptTestResult, TestStatus};
+use super::harness::{WptSuiteResults, WptTestResult, TestStatus};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+
+// External dependencies (from workspace)
+extern crate serde;
+extern crate serde_json;
 
 /// Output format for test reports
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -19,6 +19,12 @@ use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
+// External dependencies (from workspace)
+extern crate serde;
+extern crate serde_json;
+extern crate toml;
+extern crate reqwest;
+
 /// Configuration for WPT execution
 #[derive(Debug, Clone, Deserialize)]
 pub struct WptConfig {
@@ -187,7 +193,7 @@ impl WptSuiteResults {
 
 /// WPT Test Harness with WebDriver integration
 pub struct WptHarness {
-    config: WptConfig,
+    pub config: WptConfig,
     http_client: reqwest::blocking::Client,
     session_id: Option<String>,
     browser_process: Option<std::process::Child>,
