@@ -16,6 +16,9 @@ pub enum Error {
     #[error("No such element: {0}")]
     NoSuchElement(String),
 
+    #[error("Stale element reference: {0}")]
+    StaleElementReference(String),
+
     #[error("No such window: {0}")]
     NoSuchWindow(String),
 
@@ -60,6 +63,7 @@ impl From<Error> for WebDriverErrorResponse {
             Error::InvalidSession(_) => "invalid session id",
             Error::InvalidArgument(_) => "invalid argument",
             Error::NoSuchElement(_) => "no such element",
+            Error::StaleElementReference(_) => "stale element reference",
             Error::NoSuchWindow(_) => "no such window",
             Error::JavaScriptError(_) => "javascript error",
             Error::Timeout(_) => "timeout",

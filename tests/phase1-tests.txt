@@ -1,0 +1,126 @@
+# Phase 1 WPT Tests for FrankenBrowser
+#
+# This file contains WPT tests appropriate for Phase 1 functionality:
+# - Basic navigation
+# - History API
+# - Basic fetch operations
+# - URL handling
+#
+# Format: One test path per line, relative to WPT root
+# Lines starting with # are comments
+
+# ============================================================================
+# HTML - Navigation and Browsing
+# ============================================================================
+
+# Basic navigation
+html/browsers/browsing-the-web/navigating-across-documents/001.html
+html/browsers/browsing-the-web/navigating-across-documents/002.html
+html/browsers/browsing-the-web/navigating-across-documents/003.html
+
+# History interface
+html/browsers/history/the-history-interface/001.html
+html/browsers/history/the-history-interface/002.html
+html/browsers/history/the-history-interface/history_back.html
+html/browsers/history/the-history-interface/history_forward.html
+html/browsers/history/the-history-interface/history_go.html
+html/browsers/history/the-history-interface/history_pushstate.html
+html/browsers/history/the-history-interface/history_replacestate.html
+
+# History state
+html/browsers/history/the-history-interface/history_state.html
+html/browsers/history/the-history-interface/history_state_after_load.html
+
+# Location interface
+html/browsers/history/the-location-interface/location_assign.html
+html/browsers/history/the-location-interface/location_href.html
+html/browsers/history/the-location-interface/location_reload.html
+html/browsers/history/the-location-interface/location_replace.html
+
+# Window interface
+html/browsers/the-window-object/window-properties.html
+html/browsers/the-window-object/named-access-on-the-window-object/named-objects.html
+
+# ============================================================================
+# Fetch API - Basic Operations
+# ============================================================================
+
+# Basic fetch
+fetch/api/basic/request-headers.any.html
+fetch/api/basic/scheme-about.any.html
+fetch/api/basic/scheme-data.any.html
+fetch/api/basic/request-upload.any.html
+
+# Request interface
+fetch/api/request/request-init-001.any.html
+fetch/api/request/request-init-002.any.html
+fetch/api/request/request-structure.any.html
+
+# Response interface
+fetch/api/response/response-init-001.any.html
+fetch/api/response/response-init-002.any.html
+fetch/api/response/response-static-error.any.html
+fetch/api/response/response-static-redirect.any.html
+
+# Headers interface
+fetch/api/headers/headers-basic.any.html
+fetch/api/headers/headers-structure.any.html
+
+# ============================================================================
+# URL - URL Parsing and Manipulation
+# ============================================================================
+
+# URL constructor
+url/url-constructor.any.html
+url/url-setters.any.html
+url/url-searchparams.any.html
+
+# URLSearchParams
+url/urlsearchparams-constructor.any.html
+url/urlsearchparams-delete.any.html
+url/urlsearchparams-get.any.html
+url/urlsearchparams-has.any.html
+url/urlsearchparams-set.any.html
+
+# ============================================================================
+# DOM - Basic DOM Operations
+# ============================================================================
+
+# Document interface
+dom/interface-objects.html
+dom/nodes/Document-createEvent.html
+dom/nodes/Element-classList.html
+dom/nodes/Element-getElementsByClassName.html
+dom/nodes/Element-getElementsByTagName.html
+
+# Node operations
+dom/nodes/Node-appendChild.html
+dom/nodes/Node-cloneNode.html
+dom/nodes/Node-insertBefore.html
+dom/nodes/Node-removeChild.html
+
+# Query selectors
+dom/nodes/ParentNode-querySelector.html
+dom/nodes/ParentNode-querySelectorAll.html
+
+# ============================================================================
+# Console API
+# ============================================================================
+
+console/console-is-a-namespace.any.html
+console/console-label-conversion.any.html
+
+# ============================================================================
+# Events
+# ============================================================================
+
+dom/events/Event-dispatch-click.html
+dom/events/Event-preventDefault.html
+dom/events/Event-stopPropagation.html
+dom/events/EventTarget-addEventListener.html
+dom/events/EventTarget-dispatchEvent.html
+
+# ============================================================================
+# Total: ~70 tests
+# Expected Phase 1 pass rate: 40-50%
+# ============================================================================

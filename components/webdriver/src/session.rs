@@ -1,15 +1,41 @@
 //! WebDriver session management
 
+use crate::element::ElementCache;
 use crate::errors::{Error, Result};
 use browser_core::BrowserEngine;
 use webview_integration::WebViewWrapper;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicU32, Ordering};
 use uuid::Uuid;
 
-/// WebDriver session representing a browser instance
+/// Represents a window handle with associated metadata
+#[derive(Debug, Clone)]
+pub struct WindowHandle {
+    /// Unique window handle UUID
+    pub handle: String,
+    /// Browser tab ID (if using browser_shell)
+    pub tab_id: u32,
+    /// Window title
+    pub title: Option<String>,
+    /// Current URL
+    pub url: Option<String>,
+}
 
+impl WindowHandle {
+    /// Create a new window handle
+    pub fn new(handle: String, tab_id: u32) -> Self {
+        Self {
+            handle,
+            tab_id,
+            title: None,
+            url: None,
+        }
+    }
+}
+
+/// WebDriver session representing a browser instance
 pub struct Session {
     pub id: String,
     pub capabilities: Capabilities,
@@ -19,6 +45,14 @@ pub struct Session {
     pub browser_engine: Option<Arc<Mutex<BrowserEngine>>>,
     /// WebView wrapper for rendering and script execution (headless compatible)
     pub webview: Option<Arc<Mutex<WebViewWrapper>>>,
+    /// Element cache for managing element references
+    pub element_cache: ElementCache,
+    /// Map of window handles (UUID) to WindowHandle metadata
+    window_handles: HashMap<String, WindowHandle>,
+    /// Currently active window handle
+    current_window: Option<String>,
+    /// Counter for generating tab IDs
+    next_tab_id: AtomicU32,
 }
 
 impl Session {
@@ -27,13 +61,22 @@ impl Session {
         let id = Uuid::new_v4().to_string();
         let window_handle = Uuid::new_v4().to_string();
 
+        // Create initial window handle
+        let mut window_handles = HashMap::new();
+        let initial_handle = WindowHandle::new(window_handle.clone(), 1);
+        window_handles.insert(window_handle.clone(), initial_handle);
+
         Self {
             id,
             capabilities,
             current_url: None,
-            window_handle,
+            window_handle: window_handle.clone(),
             browser_engine: None,
             webview: None,
+            element_cache: ElementCache::new(),
+            window_handles,
+            current_window: Some(window_handle),
+            next_tab_id: AtomicU32::new(2), // Start at 2 since we used 1 for initial window
         }
     }
 
@@ -46,13 +89,22 @@ impl Session {
         let id = Uuid::new_v4().to_string();
         let window_handle = Uuid::new_v4().to_string();
 
+        // Create initial window handle
+        let mut window_handles = HashMap::new();
+        let initial_handle = WindowHandle::new(window_handle.clone(), 1);
+        window_handles.insert(window_handle.clone(), initial_handle);
+
         Self {
             id,
             capabilities,
             current_url: None,
-            window_handle,
+            window_handle: window_handle.clone(),
             browser_engine: Some(Arc::new(Mutex::new(browser_engine))),
             webview: Some(Arc::new(Mutex::new(webview))),
+            element_cache: ElementCache::new(),
+            window_handles,
+            current_window: Some(window_handle),
+            next_tab_id: AtomicU32::new(2),
         }
     }
 
@@ -61,6 +113,9 @@ impl Session {
         // Validate URL
         url::Url::parse(&url)
             .map_err(|e| Error::InvalidArgument(format!("Invalid URL: {}", e)))?;
+
+        // Invalidate element cache on navigation (prevents stale element errors)
+        self.element_cache.invalidate_cache();
 
         // If webview is available, navigate it
         if let Some(webview) = &self.webview {
@@ -120,6 +175,128 @@ impl Session {
         } else {
             Ok("<html><body></body></html>".to_string())
         }
+    }
+
+    // =================================================================
+    // Window Management Methods
+    // =================================================================
+
+    /// Create a new window handle
+    ///
+    /// # Arguments
+    ///
+    /// * `tab_id` - Optional tab ID (if None, generates new one)
+    ///
+    /// # Returns
+    ///
+    /// The UUID handle string for the new window
+    pub fn new_window_handle(&mut self, tab_id: Option<u32>) -> String {
+        let handle = Uuid::new_v4().to_string();
+        let tab_id = tab_id.unwrap_or_else(|| {
+            self.next_tab_id.fetch_add(1, Ordering::SeqCst)
+        });
+
+        let window_handle = WindowHandle::new(handle.clone(), tab_id);
+        self.window_handles.insert(handle.clone(), window_handle);
+
+        handle
+    }
+
+    /// Get a window handle by UUID
+    ///
+    /// # Arguments
+    ///
+    /// * `handle` - The window handle UUID to look up
+    ///
+    /// # Returns
+    ///
+    /// Reference to the WindowHandle if found
+    pub fn get_window_handle(&self, handle: &str) -> Option<&WindowHandle> {
+        self.window_handles.get(handle)
+    }
+
+    /// Get all window handles as UUIDs
+    ///
+    /// # Returns
+    ///
+    /// Vector of all window handle UUIDs
+    pub fn get_all_window_handles(&self) -> Vec<String> {
+        self.window_handles.keys().cloned().collect()
+    }
+
+    /// Switch to a different window
+    ///
+    /// # Arguments
+    ///
+    /// * `handle` - The window handle UUID to switch to
+    ///
+    /// # Errors
+    ///
+    /// Returns NoSuchWindow if the handle doesn't exist
+    pub fn switch_to_window(&mut self, handle: &str) -> Result<()> {
+        if !self.window_handles.contains_key(handle) {
+            return Err(Error::NoSuchWindow(format!(
+                "Window handle not found: {}",
+                handle
+            )));
+        }
+
+        self.current_window = Some(handle.to_string());
+        self.window_handle = handle.to_string(); // Update legacy field for compatibility
+
+        Ok(())
+    }
+
+    /// Close a window by handle
+    ///
+    /// # Arguments
+    ///
+    /// * `handle` - The window handle UUID to close
+    ///
+    /// # Returns
+    ///
+    /// Vector of remaining window handles
+    ///
+    /// # Errors
+    ///
+    /// Returns NoSuchWindow if the handle doesn't exist
+    pub fn close_window(&mut self, handle: &str) -> Result<Vec<String>> {
+        if !self.window_handles.contains_key(handle) {
+            return Err(Error::NoSuchWindow(format!(
+                "Window handle not found: {}",
+                handle
+            )));
+        }
+
+        self.window_handles.remove(handle);
+
+        // If we closed the current window, switch to another one
+        if self.current_window.as_deref() == Some(handle) {
+            self.current_window = self.window_handles.keys().next().cloned();
+            if let Some(new_handle) = &self.current_window {
+                self.window_handle = new_handle.clone();
+            }
+        }
+
+        Ok(self.get_all_window_handles())
+    }
+
+    /// Get current window handle
+    ///
+    /// # Returns
+    ///
+    /// Current window handle UUID
+    pub fn get_current_window(&self) -> Option<String> {
+        self.current_window.clone()
+    }
+
+    /// Get window count
+    ///
+    /// # Returns
+    ///
+    /// Number of open windows
+    pub fn window_count(&self) -> usize {
+        self.window_handles.len()
     }
 }
 
@@ -374,5 +551,156 @@ mod tests {
         assert_eq!(timeouts.script, 30000);
         assert_eq!(timeouts.page_load, 300000);
         assert_eq!(timeouts.implicit, 0);
+    }
+
+    // =================================================================
+    // Window Management Tests
+    // =================================================================
+
+    #[test]
+    fn test_session_has_initial_window_handle() {
+        let caps = Capabilities::default();
+        let session = Session::new(caps);
+
+        assert_eq!(session.window_count(), 1);
+        assert!(session.get_current_window().is_some());
+    }
+
+    #[test]
+    fn test_new_window_handle() {
+        let caps = Capabilities::default();
+        let mut session = Session::new(caps);
+
+        let initial_count = session.window_count();
+        let new_handle = session.new_window_handle(None);
+
+        assert!(!new_handle.is_empty());
+        assert_eq!(session.window_count(), initial_count + 1);
+        assert!(session.get_window_handle(&new_handle).is_some());
+    }
+
+    #[test]
+    fn test_new_window_handle_with_tab_id() {
+        let caps = Capabilities::default();
+        let mut session = Session::new(caps);
+
+        let new_handle = session.new_window_handle(Some(42));
+        let window = session.get_window_handle(&new_handle).unwrap();
+
+        assert_eq!(window.tab_id, 42);
+    }
+
+    #[test]
+    fn test_get_all_window_handles() {
+        let caps = Capabilities::default();
+        let mut session = Session::new(caps);
+
+        let handles = session.get_all_window_handles();
+        assert_eq!(handles.len(), 1);
+
+        let handle2 = session.new_window_handle(None);
+        let handle3 = session.new_window_handle(None);
+
+        let handles = session.get_all_window_handles();
+        assert_eq!(handles.len(), 3);
+        assert!(handles.contains(&handle2));
+        assert!(handles.contains(&handle3));
+    }
+
+    #[test]
+    fn test_switch_to_window() {
+        let caps = Capabilities::default();
+        let mut session = Session::new(caps);
+
+        let handle1 = session.get_current_window().unwrap();
+        let handle2 = session.new_window_handle(None);
+
+        session.switch_to_window(&handle2).unwrap();
+        assert_eq!(session.get_current_window(), Some(handle2.clone()));
+
+        session.switch_to_window(&handle1).unwrap();
+        assert_eq!(session.get_current_window(), Some(handle1));
+    }
+
+    #[test]
+    fn test_switch_to_invalid_window() {
+        let caps = Capabilities::default();
+        let mut session = Session::new(caps);
+
+        let result = session.switch_to_window("invalid-handle");
+        assert!(result.is_err());
+
+        match result {
+            Err(Error::NoSuchWindow(_)) => (),
+            _ => panic!("Expected NoSuchWindow error"),
+        }
+    }
+
+    #[test]
+    fn test_close_window() {
+        let caps = Capabilities::default();
+        let mut session = Session::new(caps);
+
+        let handle1 = session.get_current_window().unwrap();
+        let handle2 = session.new_window_handle(None);
+
+        assert_eq!(session.window_count(), 2);
+
+        let remaining = session.close_window(&handle2).unwrap();
+        assert_eq!(session.window_count(), 1);
+        assert_eq!(remaining.len(), 1);
+        assert!(remaining.contains(&handle1));
+    }
+
+    #[test]
+    fn test_close_window_switches_to_another() {
+        let caps = Capabilities::default();
+        let mut session = Session::new(caps);
+
+        let handle1 = session.get_current_window().unwrap();
+        let handle2 = session.new_window_handle(None);
+
+        // Close current window (handle1)
+        session.close_window(&handle1).unwrap();
+
+        // Should switch to handle2
+        assert_eq!(session.get_current_window(), Some(handle2));
+    }
+
+    #[test]
+    fn test_close_invalid_window() {
+        let caps = Capabilities::default();
+        let mut session = Session::new(caps);
+
+        let result = session.close_window("invalid-handle");
+        assert!(result.is_err());
+
+        match result {
+            Err(Error::NoSuchWindow(_)) => (),
+            _ => panic!("Expected NoSuchWindow error"),
+        }
+    }
+
+    #[test]
+    fn test_close_last_window() {
+        let caps = Capabilities::default();
+        let mut session = Session::new(caps);
+
+        let handle = session.get_current_window().unwrap();
+        let remaining = session.close_window(&handle).unwrap();
+
+        assert_eq!(session.window_count(), 0);
+        assert_eq!(remaining.len(), 0);
+        assert!(session.get_current_window().is_none());
+    }
+
+    #[test]
+    fn test_window_handle_struct() {
+        let handle = WindowHandle::new("test-uuid".to_string(), 42);
+
+        assert_eq!(handle.handle, "test-uuid");
+        assert_eq!(handle.tab_id, 42);
+        assert!(handle.title.is_none());
+        assert!(handle.url.is_none());
     }
 }
