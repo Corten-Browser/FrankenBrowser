@@ -41,3 +41,4 @@ target/
 Cargo.lock
 **/*.rs.bk
 *.pdb
+tests/tracking/test_results.db
