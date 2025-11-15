@@ -33,6 +33,26 @@ pub enum Error {
     #[error("Invalid URL: {0}")]
     InvalidUrl(String),
 
+    /// Unsupported protocol
+    #[error("Unsupported protocol: {0}")]
+    UnsupportedProtocol(String),
+
+    /// SSL error
+    #[error("SSL error: {0}")]
+    SslError(String),
+
+    /// File not found
+    #[error("File not found: {0}")]
+    FileNotFound(String),
+
+    /// Redirect loop detected
+    #[error("Redirect loop detected")]
+    RedirectLoop,
+
+    /// Navigation timeout
+    #[error("Navigation timeout")]
+    Timeout,
+
     /// Other errors
     #[error(transparent)]
     Other(#[from] anyhow::Error),

@@ -1,6 +1,7 @@
 //! Type definitions for browser_core component
 
 use crate::errors::{Error, Result};
+use crate::navigation::Navigator;
 use config_manager::Config;
 use message_bus::MessageSender;
 use network_stack::NetworkStack;
@@ -113,6 +114,8 @@ pub struct BrowserEngine {
     /// Message bus for sending messages
     #[allow(dead_code)]
     message_bus: Box<dyn MessageSender>,
+    /// Navigator for protocol handling
+    navigator: Arc<Mutex<Navigator>>,
     /// Per-tab navigation state
     tabs: Arc<Mutex<HashMap<u32, TabState>>>,
     /// History database connection
@@ -154,6 +157,7 @@ impl BrowserEngine {
             config,
             network,
             message_bus,
+            navigator: Arc::new(Mutex::new(Navigator::new())),
             tabs: Arc::new(Mutex::new(HashMap::new())),
             history_db: Arc::new(Mutex::new(history_db)),
             bookmarks_db: Arc::new(Mutex::new(bookmarks_db)),
@@ -209,22 +213,33 @@ impl BrowserEngine {
     /// # Errors
     ///
     /// Returns an error if:
+    /// - URL validation fails
+    /// - Protocol is unsupported
     /// - Network fetch fails
-    /// - Tab doesn't exist (creates it automatically)
     pub fn navigate(&mut self, tab_id: u32, url: Url) -> Result<()> {
-        // Get or create tab state
-        {
-            let mut tabs = self.tabs.lock().unwrap();
-            let tab_state = tabs.entry(tab_id).or_insert_with(TabState::new);
+        // Use Navigator to handle protocol-specific navigation
+        let nav_result = {
+            let mut navigator = self.navigator.lock().unwrap();
+            navigator.navigate(url.clone())
+        };
 
-            // Update tab navigation state
-            tab_state.navigate(url.clone());
-        } // Lock is dropped here
+        // Process navigation result
+        match nav_result {
+            Ok(_state) => {
+                // Update tab navigation state
+                {
+                    let mut tabs = self.tabs.lock().unwrap();
+                    let tab_state = tabs.entry(tab_id).or_insert_with(TabState::new);
+                    tab_state.navigate(url.clone());
+                }
 
-        // Add to history
-        self.add_to_history(url.as_str(), "")?;
+                // Add to history
+                self.add_to_history(url.as_str(), "")?;
 
-        Ok(())
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
     }
 
     /// Go back in history
