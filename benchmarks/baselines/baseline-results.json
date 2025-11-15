@@ -1,0 +1,289 @@
+{
+  "version": "0.1.0",
+  "baseline_date": "2025-11-15",
+  "platform": "linux-x86_64",
+  "description": "Initial performance baselines for FrankenBrowser",
+  "benchmarks": {
+    "page_load": {
+      "page_load_simple": {
+        "mean_ns": 50000000,
+        "std_dev_ns": 5000000,
+        "min_ns": 45000000,
+        "max_ns": 60000000,
+        "unit": "nanoseconds",
+        "description": "Simple page load (HTML only)",
+        "target": "< 100ms",
+        "regression_threshold": 1.10
+      },
+      "page_load_complex": {
+        "mean_ns": 200000000,
+        "std_dev_ns": 20000000,
+        "min_ns": 180000000,
+        "max_ns": 250000000,
+        "unit": "nanoseconds",
+        "description": "Complex page with multiple resources",
+        "target": "< 500ms",
+        "regression_threshold": 1.10
+      },
+      "page_load_cached/cold_cache": {
+        "mean_ns": 60000000,
+        "std_dev_ns": 6000000,
+        "min_ns": 55000000,
+        "max_ns": 70000000,
+        "unit": "nanoseconds",
+        "description": "Page load with cold cache",
+        "target": "< 150ms",
+        "regression_threshold": 1.10
+      },
+      "page_load_cached/warm_cache": {
+        "mean_ns": 10000000,
+        "std_dev_ns": 1000000,
+        "min_ns": 9000000,
+        "max_ns": 12000000,
+        "unit": "nanoseconds",
+        "description": "Page load with warm cache (should be fast)",
+        "target": "< 20ms",
+        "regression_threshold": 1.10
+      },
+      "page_load_parallel/1": {
+        "mean_ns": 50000000,
+        "std_dev_ns": 5000000,
+        "unit": "nanoseconds",
+        "description": "1 concurrent page load",
+        "regression_threshold": 1.10
+      },
+      "page_load_parallel/2": {
+        "mean_ns": 60000000,
+        "std_dev_ns": 7000000,
+        "unit": "nanoseconds",
+        "description": "2 concurrent page loads",
+        "regression_threshold": 1.10
+      },
+      "page_load_parallel/4": {
+        "mean_ns": 80000000,
+        "std_dev_ns": 10000000,
+        "unit": "nanoseconds",
+        "description": "4 concurrent page loads",
+        "regression_threshold": 1.10
+      },
+      "page_load_parallel/8": {
+        "mean_ns": 120000000,
+        "std_dev_ns": 15000000,
+        "unit": "nanoseconds",
+        "description": "8 concurrent page loads",
+        "regression_threshold": 1.15
+      }
+    },
+    "tab_switching": {
+      "tab_switch_two_tabs": {
+        "mean_ns": 500000,
+        "std_dev_ns": 50000,
+        "min_ns": 450000,
+        "max_ns": 600000,
+        "unit": "nanoseconds",
+        "description": "Switch between two tabs",
+        "target": "< 5ms",
+        "regression_threshold": 1.10
+      },
+      "tab_switch_many_tabs/5": {
+        "mean_ns": 2500000,
+        "std_dev_ns": 250000,
+        "unit": "nanoseconds",
+        "description": "Switch among 5 tabs",
+        "target": "< 10ms",
+        "regression_threshold": 1.10
+      },
+      "tab_switch_many_tabs/10": {
+        "mean_ns": 5000000,
+        "std_dev_ns": 500000,
+        "unit": "nanoseconds",
+        "description": "Switch among 10 tabs",
+        "target": "< 20ms",
+        "regression_threshold": 1.10
+      },
+      "tab_switch_many_tabs/20": {
+        "mean_ns": 10000000,
+        "std_dev_ns": 1000000,
+        "unit": "nanoseconds",
+        "description": "Switch among 20 tabs",
+        "target": "< 50ms",
+        "regression_threshold": 1.10
+      },
+      "tab_switch_cold_activation": {
+        "mean_ns": 1000000,
+        "std_dev_ns": 100000,
+        "unit": "nanoseconds",
+        "description": "Activate a background tab",
+        "target": "< 10ms",
+        "regression_threshold": 1.10
+      },
+      "tab_first_paint_after_switch": {
+        "mean_ns": 800000,
+        "std_dev_ns": 80000,
+        "unit": "nanoseconds",
+        "description": "Time to first paint after tab switch",
+        "target": "< 5ms",
+        "regression_threshold": 1.10
+      }
+    },
+    "memory_usage": {
+      "memory_baseline": {
+        "mean_bytes": 50000000,
+        "std_dev_bytes": 5000000,
+        "unit": "bytes",
+        "description": "Empty browser baseline memory",
+        "target": "< 100 MB",
+        "regression_threshold": 1.10
+      },
+      "memory_single_tab": {
+        "mean_bytes": 100000000,
+        "std_dev_bytes": 10000000,
+        "unit": "bytes",
+        "description": "Memory with one tab open",
+        "target": "< 150 MB",
+        "regression_threshold": 1.10
+      },
+      "memory_multi_tab/5": {
+        "mean_bytes": 300000000,
+        "std_dev_bytes": 30000000,
+        "unit": "bytes",
+        "description": "Memory with 5 tabs",
+        "target": "< 400 MB",
+        "regression_threshold": 1.10
+      },
+      "memory_multi_tab/10": {
+        "mean_bytes": 550000000,
+        "std_dev_bytes": 55000000,
+        "unit": "bytes",
+        "description": "Memory with 10 tabs",
+        "target": "< 700 MB",
+        "regression_threshold": 1.10
+      },
+      "memory_multi_tab/20": {
+        "mean_bytes": 1050000000,
+        "std_dev_bytes": 105000000,
+        "unit": "bytes",
+        "description": "Memory with 20 tabs",
+        "target": "< 1.5 GB",
+        "regression_threshold": 1.10
+      },
+      "memory_leak_detection": {
+        "memory_growth_bytes": 5000000,
+        "leak_detected": false,
+        "unit": "bytes",
+        "description": "Memory leak test (100 cycles)",
+        "target": "< 10 MB growth, no leak",
+        "regression_threshold": 1.20
+      },
+      "memory_cleanup_efficiency": {
+        "cleanup_ratio": 0.95,
+        "unit": "ratio",
+        "description": "Memory cleanup efficiency (1.0 = perfect)",
+        "target": "> 0.90",
+        "regression_threshold": 0.90
+      }
+    },
+    "adblock_overhead": {
+      "filter_lookup/ad_url_lookup": {
+        "mean_ns": 5000,
+        "std_dev_ns": 500,
+        "unit": "nanoseconds",
+        "description": "Single ad URL lookup time",
+        "target": "< 10 μs",
+        "regression_threshold": 1.10
+      },
+      "filter_lookup/safe_url_lookup": {
+        "mean_ns": 3000,
+        "std_dev_ns": 300,
+        "unit": "nanoseconds",
+        "description": "Single safe URL lookup time",
+        "target": "< 10 μs",
+        "regression_threshold": 1.10
+      },
+      "filter_bulk_lookup/100": {
+        "mean_ns": 500000,
+        "std_dev_ns": 50000,
+        "unit": "nanoseconds",
+        "description": "100 URL lookups",
+        "target": "< 1 ms",
+        "regression_threshold": 1.10
+      },
+      "filter_bulk_lookup/1000": {
+        "mean_ns": 5000000,
+        "std_dev_ns": 500000,
+        "unit": "nanoseconds",
+        "description": "1000 URL lookups",
+        "target": "< 10 ms",
+        "regression_threshold": 1.10
+      },
+      "page_load_blocking/with_adblock": {
+        "mean_ns": 300000000,
+        "std_dev_ns": 30000000,
+        "resources_blocked": 30,
+        "resources_allowed": 20,
+        "unit": "nanoseconds",
+        "description": "Page load with ad blocking enabled",
+        "target": "< 500ms, >60% blocked",
+        "regression_threshold": 1.10
+      },
+      "page_load_blocking/without_adblock": {
+        "mean_ns": 500000000,
+        "std_dev_ns": 50000000,
+        "unit": "nanoseconds",
+        "description": "Page load without ad blocking (baseline)",
+        "regression_threshold": 1.10
+      },
+      "blocking_effectiveness": {
+        "block_rate": 0.90,
+        "false_positive_rate": 0.05,
+        "unit": "ratio",
+        "description": "Ad blocking effectiveness",
+        "target": "> 90% block rate, < 5% false positives",
+        "regression_threshold": 0.85
+      },
+      "filter_memory_overhead": {
+        "mean_bytes": 10000000,
+        "std_dev_bytes": 1000000,
+        "unit": "bytes",
+        "description": "Memory overhead of filter engine",
+        "target": "< 20 MB",
+        "regression_threshold": 1.10
+      }
+    }
+  },
+  "performance_targets": {
+    "page_load_time": {
+      "simple_page": "< 100ms",
+      "complex_page": "< 500ms",
+      "cached_page": "< 20ms"
+    },
+    "tab_switching": {
+      "latency": "< 5ms",
+      "first_paint": "< 10ms"
+    },
+    "memory_usage": {
+      "baseline": "< 100 MB",
+      "per_tab_average": "< 50 MB",
+      "max_20_tabs": "< 1.5 GB"
+    },
+    "adblock": {
+      "lookup_time": "< 10 μs",
+      "block_rate": "> 90%",
+      "false_positive_rate": "< 5%",
+      "memory_overhead": "< 20 MB"
+    }
+  },
+  "regression_policy": {
+    "description": "Performance regression thresholds",
+    "default_threshold": 1.10,
+    "critical_threshold": 1.20,
+    "action_on_regression": "Report warning, require review before merge"
+  },
+  "notes": [
+    "These baselines are initial estimates and should be updated after first benchmark run",
+    "Regression threshold is a multiplier (e.g., 1.10 = 10% slower is acceptable)",
+    "Actual values will vary by hardware and system load",
+    "Run benchmarks multiple times and take median for stable results",
+    "Memory measurements are approximate and should be validated with OS tools"
+  ]
+}

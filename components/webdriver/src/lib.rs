@@ -47,11 +47,16 @@
 //! This implementation follows the W3C WebDriver specification:
 //! https://w3c.github.io/webdriver/
 
+pub mod dom_interface;
+pub mod element;
 pub mod errors;
+pub mod script_args;
 pub mod server;
 pub mod session;
 
 // Re-export main types
+pub use dom_interface::{DomInterface, LocatorStrategy};
+pub use element::{CachedElement, ElementCache, ElementReference};
 pub use errors::{Error, Result};
 pub use server::{start_server, WebDriverState};
 pub use session::{Capabilities, Session, SessionManager};

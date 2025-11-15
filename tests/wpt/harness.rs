@@ -19,6 +19,12 @@ use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
+// External dependencies (from workspace)
+extern crate serde;
+extern crate serde_json;
+extern crate toml;
+extern crate reqwest;
+
 /// Configuration for WPT execution
 #[derive(Debug, Clone, Deserialize)]
 pub struct WptConfig {
@@ -26,6 +32,25 @@ pub struct WptConfig {
     pub binary_path: PathBuf,
     pub test_subsets: Vec<String>,
     pub expected_pass_rate: f64,
+    pub webdriver_port: u16,
+    pub browser_binary: PathBuf,
+    pub headless: bool,
+    pub timeout_seconds: u64,
+}
+
+impl Default for WptConfig {
+    fn default() -> Self {
+        Self {
+            test_path: PathBuf::from("../wpt"),
+            binary_path: PathBuf::from("target/release/frankenbrowser"),
+            test_subsets: vec![],
+            expected_pass_rate: 0.40,
+            webdriver_port: 4444,
+            browser_binary: PathBuf::from("target/release/frankenbrowser"),
+            headless: true,
+            timeout_seconds: 30,
+        }
+    }
 }
 
 impl WptConfig {
@@ -57,6 +82,22 @@ impl WptConfig {
             expected_pass_rate: wpt_config.get("expected_pass_rate")
                 .and_then(|v| v.as_float())
                 .unwrap_or(0.40),
+            webdriver_port: wpt_config.get("webdriver_port")
+                .and_then(|v| v.as_integer())
+                .map(|v| v as u16)
+                .unwrap_or(4444),
+            browser_binary: PathBuf::from(
+                wpt_config.get("browser_binary")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("target/release/frankenbrowser")
+            ),
+            headless: wpt_config.get("headless")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(true),
+            timeout_seconds: wpt_config.get("timeout_seconds")
+                .and_then(|v| v.as_integer())
+                .map(|v| v as u64)
+                .unwrap_or(30),
         })
     }
 }
@@ -150,51 +191,259 @@ impl WptSuiteResults {
     }
 }
 
-/// WPT Test Harness
+/// WPT Test Harness with WebDriver integration
 pub struct WptHarness {
-    config: WptConfig,
+    pub config: WptConfig,
+    http_client: reqwest::blocking::Client,
+    session_id: Option<String>,
+    browser_process: Option<std::process::Child>,
 }
 
 impl WptHarness {
     /// Create a new WPT harness
     pub fn new(config: WptConfig) -> Self {
-        Self { config }
+        let http_client = reqwest::blocking::Client::builder()
+            .timeout(std::time::Duration::from_secs(config.timeout_seconds))
+            .build()
+            .expect("Failed to create HTTP client");
+
+        Self {
+            config,
+            http_client,
+            session_id: None,
+            browser_process: None,
+        }
+    }
+
+    /// Start the browser with WebDriver server
+    pub fn start_browser(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        if self.browser_process.is_some() {
+            return Ok(()); // Already started
+        }
+
+        // Build command to start browser with WebDriver
+        let mut cmd = Command::new(&self.config.browser_binary);
+        cmd.arg("--webdriver")
+            .arg(format!("--webdriver-port={}", self.config.webdriver_port));
+
+        if self.config.headless {
+            cmd.arg("--headless");
+        }
+
+        // Redirect stdout/stderr to null for cleaner output
+        cmd.stdout(Stdio::null()).stderr(Stdio::null());
+
+        // Start browser process
+        let child = cmd.spawn()
+            .map_err(|e| format!("Failed to start browser: {}", e))?;
+
+        self.browser_process = Some(child);
+
+        // Wait for WebDriver server to be ready
+        std::thread::sleep(std::time::Duration::from_secs(2));
+
+        Ok(())
+    }
+
+    /// Stop the browser process
+    pub fn stop_browser(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(mut process) = self.browser_process.take() {
+            process.kill()?;
+            process.wait()?;
+        }
+        Ok(())
+    }
+
+    /// Create a WebDriver session
+    pub fn create_session(&mut self) -> Result<String, Box<dyn std::error::Error>> {
+        let url = format!("http://127.0.0.1:{}/session", self.config.webdriver_port);
+
+        let payload = serde_json::json!({
+            "capabilities": {
+                "alwaysMatch": {
+                    "browserName": "frankenbrowser",
+                    "browserVersion": "0.1.0"
+                }
+            }
+        });
+
+        let response = self.http_client
+            .post(&url)
+            .json(&payload)
+            .send()?;
+
+        if !response.status().is_success() {
+            return Err(format!("Failed to create session: {}", response.status()).into());
+        }
+
+        let json: serde_json::Value = response.json()?;
+        let session_id = json["value"]["sessionId"]
+            .as_str()
+            .ok_or("Missing session ID in response")?
+            .to_string();
+
+        self.session_id = Some(session_id.clone());
+        Ok(session_id)
+    }
+
+    /// Delete the WebDriver session
+    pub fn delete_session(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(session_id) = &self.session_id {
+            let url = format!("http://127.0.0.1:{}/session/{}",
+                self.config.webdriver_port, session_id);
+
+            let response = self.http_client.delete(&url).send()?;
+
+            if !response.status().is_success() {
+                return Err(format!("Failed to delete session: {}", response.status()).into());
+            }
+
+            self.session_id = None;
+        }
+        Ok(())
+    }
+
+    /// Navigate to a URL via WebDriver
+    pub fn navigate(&self, url: &str) -> Result<(), Box<dyn std::error::Error>> {
+        let session_id = self.session_id.as_ref()
+            .ok_or("No active session")?;
+
+        let endpoint = format!("http://127.0.0.1:{}/session/{}/url",
+            self.config.webdriver_port, session_id);
+
+        let payload = serde_json::json!({ "url": url });
+
+        let response = self.http_client
+            .post(&endpoint)
+            .json(&payload)
+            .send()?;
+
+        if !response.status().is_success() {
+            return Err(format!("Navigation failed: {}", response.status()).into());
+        }
+
+        Ok(())
+    }
+
+    /// Execute JavaScript and return the result
+    pub fn execute_script(&self, script: &str) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let session_id = self.session_id.as_ref()
+            .ok_or("No active session")?;
+
+        let endpoint = format!("http://127.0.0.1:{}/session/{}/execute/sync",
+            self.config.webdriver_port, session_id);
+
+        let payload = serde_json::json!({
+            "script": script,
+            "args": []
+        });
+
+        let response = self.http_client
+            .post(&endpoint)
+            .json(&payload)
+            .send()?;
+
+        if !response.status().is_success() {
+            return Err(format!("Script execution failed: {}", response.status()).into());
+        }
+
+        let json: serde_json::Value = response.json()?;
+        Ok(json["value"].clone())
+    }
+
+    /// Run a single WPT test file
+    pub fn run_test(&self, test_path: &str) -> Result<WptTestResult, Box<dyn std::error::Error>> {
+        use std::time::Instant;
+
+        let start = Instant::now();
+        let full_path = self.config.test_path.join(test_path);
+
+        // Navigate to test file
+        let test_url = format!("file://{}", full_path.display());
+
+        match self.navigate(&test_url) {
+            Ok(_) => {
+                // Wait for test to complete and get result
+                std::thread::sleep(std::time::Duration::from_millis(500));
+
+                // Execute script to check test status
+                let script = r#"
+                    if (typeof window.testharness !== 'undefined') {
+                        return window.testharness.status;
+                    }
+                    return { status: 'unknown' };
+                "#;
+
+                match self.execute_script(script) {
+                    Ok(result) => {
+                        let duration = start.elapsed().as_millis() as u64;
+
+                        // Parse result (simplified)
+                        let status = if result.get("status").and_then(|v| v.as_str()) == Some("passed") {
+                            TestStatus::Pass
+                        } else {
+                            TestStatus::Fail
+                        };
+
+                        Ok(WptTestResult {
+                            test_name: test_path.to_string(),
+                            status,
+                            message: result.get("message").and_then(|v| v.as_str()).map(|s| s.to_string()),
+                            duration_ms: duration,
+                        })
+                    }
+                    Err(e) => {
+                        let duration = start.elapsed().as_millis() as u64;
+                        Ok(WptTestResult {
+                            test_name: test_path.to_string(),
+                            status: TestStatus::Error,
+                            message: Some(format!("Script error: {}", e)),
+                            duration_ms: duration,
+                        })
+                    }
+                }
+            }
+            Err(e) => {
+                let duration = start.elapsed().as_millis() as u64;
+                Ok(WptTestResult {
+                    test_name: test_path.to_string(),
+                    status: TestStatus::Error,
+                    message: Some(format!("Navigation error: {}", e)),
+                    duration_ms: duration,
+                })
+            }
+        }
+    }
+
+    /// Run multiple WPT tests
+    pub fn run_test_suite(&self, tests: &[String]) -> Result<WptSuiteResults, Box<dyn std::error::Error>> {
+        let mut results = WptSuiteResults::new();
+
+        for test in tests {
+            match self.run_test(test) {
+                Ok(result) => results.add_result(result),
+                Err(e) => {
+                    results.add_result(WptTestResult {
+                        test_name: test.clone(),
+                        status: TestStatus::Error,
+                        message: Some(format!("Test error: {}", e)),
+                        duration_ms: 0,
+                    });
+                }
+            }
+        }
+
+        Ok(results)
     }
 
     /// Check if WPT repository is available
     pub fn check_wpt_available(&self) -> bool {
-        self.config.test_path.exists() && self.config.test_path.join("wpt").exists()
+        self.config.test_path.exists()
     }
 
     /// Check if browser binary is available
     pub fn check_browser_available(&self) -> bool {
-        self.config.binary_path.exists()
-    }
-
-    /// Run WPT tests (placeholder - requires WebDriver implementation)
-    pub fn run_tests(&self) -> Result<WptSuiteResults, Box<dyn std::error::Error>> {
-        // Check prerequisites
-        if !self.check_wpt_available() {
-            return Err(format!(
-                "WPT repository not found at {:?}. Please clone: git clone https://github.com/web-platform-tests/wpt.git",
-                self.config.test_path
-            ).into());
-        }
-
-        if !self.check_browser_available() {
-            return Err(format!(
-                "Browser binary not found at {:?}. Please build: cargo build --release",
-                self.config.binary_path
-            ).into());
-        }
-
-        // TODO: Implement actual test execution
-        // This requires:
-        // 1. WebDriver protocol implementation in browser
-        // 2. Headless mode support
-        // 3. Test runner integration
-
-        Err("WPT execution not yet implemented. Requires WebDriver support and headless mode.".into())
+        self.config.browser_binary.exists()
     }
 
     /// Generate placeholder results for testing infrastructure
@@ -221,6 +470,14 @@ impl WptHarness {
     }
 }
 
+impl Drop for WptHarness {
+    fn drop(&mut self) {
+        // Clean up session and browser process
+        let _ = self.delete_session();
+        let _ = self.stop_browser();
+    }
+}
+
 impl Default for WptSuiteResults {
     fn default() -> Self {
         Self::new()
@@ -232,16 +489,30 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_config_default() {
+        let config = WptConfig::default();
+        assert_eq!(config.webdriver_port, 4444);
+        assert_eq!(config.headless, true);
+        assert_eq!(config.timeout_seconds, 30);
+        assert_eq!(config.expected_pass_rate, 0.40);
+    }
+
+    #[test]
     fn test_config_structure() {
         // Test that config structure is properly defined
         let config = WptConfig {
             test_path: PathBuf::from("../wpt"),
-            binary_path: PathBuf::from("target/release/frankenstein-browser"),
+            binary_path: PathBuf::from("target/release/frankenbrowser"),
             test_subsets: vec!["html".to_string()],
             expected_pass_rate: 0.40,
+            webdriver_port: 4444,
+            browser_binary: PathBuf::from("target/release/frankenbrowser"),
+            headless: true,
+            timeout_seconds: 30,
         };
 
         assert_eq!(config.expected_pass_rate, 0.40);
+        assert_eq!(config.webdriver_port, 4444);
     }
 
     #[test]
@@ -269,18 +540,58 @@ mod tests {
     }
 
     #[test]
-    fn test_placeholder_results() {
-        let config = WptConfig {
-            test_path: PathBuf::from("../wpt"),
-            binary_path: PathBuf::from("target/release/frankenstein-browser"),
-            test_subsets: vec![],
-            expected_pass_rate: 0.40,
-        };
+    fn test_test_status_string() {
+        assert_eq!(TestStatus::Pass.as_str(), "PASS");
+        assert_eq!(TestStatus::Fail.as_str(), "FAIL");
+        assert_eq!(TestStatus::Timeout.as_str(), "TIMEOUT");
+        assert_eq!(TestStatus::Skip.as_str(), "SKIP");
+        assert_eq!(TestStatus::Error.as_str(), "ERROR");
+    }
 
+    #[test]
+    fn test_harness_creation() {
+        let config = WptConfig::default();
+        let harness = WptHarness::new(config);
+        assert!(harness.session_id.is_none());
+        assert!(harness.browser_process.is_none());
+    }
+
+    #[test]
+    fn test_placeholder_results() {
+        let config = WptConfig::default();
         let harness = WptHarness::new(config);
         let results = harness.generate_placeholder_results();
 
         assert!(results.total_tests > 0);
         assert_eq!(results.skipped, results.total_tests);
+    }
+
+    #[test]
+    fn test_results_serialization() {
+        let result = WptTestResult {
+            test_name: "test.html".to_string(),
+            status: TestStatus::Pass,
+            message: None,
+            duration_ms: 100,
+        };
+
+        let json = serde_json::to_string(&result).unwrap();
+        assert!(json.contains("test.html"));
+        assert!(json.contains("Pass"));
+    }
+
+    #[test]
+    fn test_suite_results_serialization() {
+        let mut results = WptSuiteResults::new();
+        results.add_result(WptTestResult {
+            test_name: "test1.html".to_string(),
+            status: TestStatus::Pass,
+            message: None,
+            duration_ms: 100,
+        });
+
+        let json = serde_json::to_string(&results).unwrap();
+        assert!(json.contains("test1.html"));
+        assert!(json.contains("\"passed\":1"));
     }
 }

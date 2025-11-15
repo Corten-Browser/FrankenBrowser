@@ -9,8 +9,11 @@ license = "MIT OR Apache-2.0"
 shared-types = { path = "../shared_types" }
 message-bus = { path = "../message_bus" }
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 anyhow = "1.0"
 thiserror = "1.0"
+uuid = { version = "1.6", features = ["v4", "serde"] }
+url = "2.5"
 wry = { version = "0.53", optional = true, default-features = false, features = ["linux-body", "protocol"] }
 tao = { version = "0.34", optional = true }
 
