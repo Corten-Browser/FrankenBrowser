@@ -374,7 +374,7 @@ fn test_mixed_type_array() {
         true,
         false,
         42,
-        3.14,
+        42.5,
         "string",
         [1, 2],
         {"key": "value"},
@@ -388,7 +388,7 @@ fn test_mixed_type_array() {
     assert!(js.contains("true"));
     assert!(js.contains("false"));
     assert!(js.contains("42"));
-    assert!(js.contains("3.14"));
+    assert!(js.contains("42.5"));
     assert!(js.contains("\"string\""));
     assert!(js.contains("[1, 2]"));
     assert!(js.contains("\"key\": \"value\""));

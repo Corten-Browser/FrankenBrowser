@@ -254,9 +254,9 @@ mod tests {
         assert_eq!(arg.to_javascript(), "42");
 
         // Float
-        let arg = ScriptArgument::from_json(json!(3.14159));
-        assert_eq!(arg, ScriptArgument::Number(3.14159));
-        assert_eq!(arg.to_javascript(), "3.14159");
+        let arg = ScriptArgument::from_json(json!(42.5));
+        assert_eq!(arg, ScriptArgument::Number(42.5));
+        assert_eq!(arg.to_javascript(), "42.5");
 
         // Negative
         let arg = ScriptArgument::from_json(json!(-100));
@@ -453,8 +453,8 @@ mod tests {
         let result = parse_script_result("42").unwrap();
         assert_eq!(result, json!(42));
 
-        let result = parse_script_result("3.14159").unwrap();
-        assert_eq!(result, json!(3.14159));
+        let result = parse_script_result("42.5").unwrap();
+        assert_eq!(result, json!(42.5));
     }
 
     #[test]

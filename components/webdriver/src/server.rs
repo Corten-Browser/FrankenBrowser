@@ -1210,6 +1210,7 @@ pub struct WindowRectRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde_json::json;
 
     #[test]
     fn test_webdriver_state_creation() {
@@ -1250,8 +1251,6 @@ mod tests {
 
     #[test]
     fn test_execute_script_request_with_args() {
-        use serde_json::json;
-
         let req = ExecuteScriptRequest {
             script: "return arguments[0] + arguments[1];".to_string(),
             args: vec![json!(5), json!(3)],
@@ -1264,8 +1263,6 @@ mod tests {
 
     #[test]
     fn test_execute_script_request_no_args() {
-        use serde_json::json;
-
         let req = ExecuteScriptRequest {
             script: "return 42;".to_string(),
             args: vec![],
@@ -1277,8 +1274,6 @@ mod tests {
 
     #[test]
     fn test_execute_script_request_with_element_arg() {
-        use serde_json::json;
-
         let req = ExecuteScriptRequest {
             script: "return arguments[0].tagName;".to_string(),
             args: vec![json!({"element-6066-11e4-a52e-4f735466cecf": "elem-123"})],
@@ -1290,8 +1285,6 @@ mod tests {
 
     #[test]
     fn test_execute_script_request_complex_args() {
-        use serde_json::json;
-
         let req = ExecuteScriptRequest {
             script: "return arguments[0].user.name;".to_string(),
             args: vec![json!({
@@ -1309,8 +1302,6 @@ mod tests {
 
     #[test]
     fn test_execute_script_response_serialization() {
-        use serde_json::json;
-
         let resp = ExecuteScriptResponse {
             value: json!({"result": 42}),
         };
