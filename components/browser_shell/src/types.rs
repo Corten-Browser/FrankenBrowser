@@ -1,6 +1,7 @@
 //! Core types for browser shell
 
 use crate::errors::{Error, Result};
+use crate::menu::{MenuAction, MenuBar};
 use config_manager::ShellConfig;
 use message_bus::MessageSender;
 use std::collections::HashMap;
@@ -62,6 +63,13 @@ pub struct BrowserShell {
     active_tab: Option<u32>,
     /// Next available tab ID
     next_tab_id: u32,
+    /// Menu bar with keyboard shortcuts and actions
+    menu_bar: MenuBar,
+    /// UI Components (headless-compatible)
+    url_bar: crate::ui_components::URLBar,
+    navigation_buttons: crate::ui_components::NavigationButtons,
+    tab_bar: crate::ui_components::TabBar,
+    status_bar: crate::ui_components::StatusBar,
     /// Event loop for GUI mode (Option because we take ownership when running)
     #[cfg(feature = "gui")]
     event_loop: Option<EventLoop<()>>,
@@ -117,6 +125,11 @@ impl BrowserShell {
                 tabs: HashMap::new(),
                 active_tab: None,
                 next_tab_id: 1,
+                menu_bar: MenuBar::new(),
+                url_bar: crate::ui_components::URLBar::new(),
+                navigation_buttons: crate::ui_components::NavigationButtons::new(),
+                tab_bar: crate::ui_components::TabBar::new(),
+                status_bar: crate::ui_components::StatusBar::new(),
                 event_loop: Some(event_loop),
                 window: Some(window),
                 webview: Some(webview),
@@ -133,6 +146,11 @@ impl BrowserShell {
                 tabs: HashMap::new(),
                 active_tab: None,
                 next_tab_id: 1,
+                menu_bar: MenuBar::new(),
+                url_bar: crate::ui_components::URLBar::new(),
+                navigation_buttons: crate::ui_components::NavigationButtons::new(),
+                tab_bar: crate::ui_components::TabBar::new(),
+                status_bar: crate::ui_components::StatusBar::new(),
             })
         }
     }
@@ -205,12 +223,15 @@ impl BrowserShell {
         self.next_tab_id += 1;
 
         let tab = Tab::new(tab_id);
-        self.tabs.insert(tab_id, tab);
+        self.tabs.insert(tab_id, tab.clone());
 
         // Set as active tab if it's the first tab
         if self.active_tab.is_none() {
             self.active_tab = Some(tab_id);
         }
+
+        // Update UI: Add tab to tab bar
+        let _ = self.tab_bar.add_tab(tab_id, tab.title.clone());
 
         // Send CreateTab message to message bus
         use shared_types::BrowserMessage;
@@ -305,6 +326,124 @@ impl BrowserShell {
     /// A reference to the tab, or None if the tab doesn't exist
     pub fn get_tab(&self, tab_id: u32) -> Option<&Tab> {
         self.tabs.get(&tab_id)
+    }
+
+    /// Get a reference to the menu bar
+    ///
+    /// # Returns
+    ///
+    /// Reference to the MenuBar
+    pub fn menu_bar(&self) -> &MenuBar {
+        &self.menu_bar
+    }
+
+    /// Get a mutable reference to the menu bar
+    ///
+    /// # Returns
+    ///
+    /// Mutable reference to the MenuBar
+    pub fn menu_bar_mut(&mut self) -> &mut MenuBar {
+        &mut self.menu_bar
+    }
+
+    /// Handle a menu action
+    ///
+    /// # Arguments
+    ///
+    /// * `action` - The menu action to handle
+    ///
+    /// # Returns
+    ///
+    /// Result of handling the action
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the action handler fails or is not registered
+    pub fn handle_menu_action(&mut self, action: &MenuAction) -> Result<()> {
+        // First try to trigger registered handler
+        if self.menu_bar.trigger_action(action).is_ok() {
+            return Ok(());
+        }
+
+        // Fall back to default handling for standard actions
+        match action {
+            MenuAction::NewTab => {
+                self.create_tab()?;
+                Ok(())
+            }
+            MenuAction::CloseTab => {
+                if let Some(tab_id) = self.active_tab {
+                    self.close_tab(tab_id)?;
+                }
+                Ok(())
+            }
+            MenuAction::Quit => {
+                // In headless mode, just return Ok
+                // In GUI mode, this would signal the event loop to exit
+                Ok(())
+            }
+            _ => Err(Error::ConfigError(format!(
+                "No handler for action: {:?}",
+                action
+            ))),
+        }
+    }
+
+    /// Enable or disable a menu item
+    ///
+    /// # Arguments
+    ///
+    /// * `menu_title` - Title of the menu containing the item
+    /// * `item_label` - Label of the menu item
+    /// * `enabled` - Whether to enable or disable the item
+    ///
+    /// # Returns
+    ///
+    /// Result of the operation
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the menu or item is not found
+    pub fn set_menu_item_enabled(
+        &mut self,
+        menu_title: &str,
+        item_label: &str,
+        enabled: bool,
+    ) -> Result<()> {
+        // Find the menu
+        let menu = self
+            .menu_bar
+            .menus
+            .iter_mut()
+            .find(|m| m.title == menu_title)
+            .ok_or_else(|| Error::ConfigError(format!("Menu not found: {}", menu_title)))?;
+
+        // Find the item
+        let item = menu
+            .items
+            .iter_mut()
+            .find(|i| i.label == item_label)
+            .ok_or_else(|| Error::ConfigError(format!("Menu item not found: {}", item_label)))?;
+
+        item.enabled = enabled;
+        Ok(())
+    }
+
+    /// Update menu item states based on browser state
+    ///
+    /// This method updates the enabled/disabled state of menu items
+    /// based on the current browser state (e.g., disable "Close Tab"
+    /// when no tabs are open).
+    pub fn update_menu_states(&mut self) {
+        let has_active_tab = self.active_tab.is_some();
+
+        // Update Close Tab based on active tab
+        let _ = self.set_menu_item_enabled("File", "Close Tab", has_active_tab);
+
+        // Update navigation buttons based on history (not implemented yet)
+        // This is a placeholder for future implementation
+        let _ = self.set_menu_item_enabled("History", "Back", false);
+        let _ = self.set_menu_item_enabled("History", "Forward", false);
     }
 }
 
@@ -620,5 +759,193 @@ mod tests {
         assert!(shell.get_tab(tab1).is_some());
         assert!(shell.get_tab(tab2).is_none());
         assert!(shell.get_tab(tab3).is_some());
+    }
+
+    // ========================================
+    // Tests for Menu Integration
+    // ========================================
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_browser_shell_has_menu_bar() {
+        let shell = create_test_shell();
+        let menu_bar = shell.menu_bar();
+
+        // Should have 6 default menus
+        assert_eq!(menu_bar.menus.len(), 6);
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_browser_shell_menu_bar_mut() {
+        let mut shell = create_test_shell();
+        let menu_bar = shell.menu_bar_mut();
+
+        // Add a custom menu
+        menu_bar.add_menu(crate::menu::Menu::new("Custom".to_string()));
+        assert_eq!(menu_bar.menus.len(), 7);
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_handle_menu_action_new_tab() {
+        let mut shell = create_test_shell();
+        assert_eq!(shell.get_tab_count(), 0);
+
+        let result = shell.handle_menu_action(&MenuAction::NewTab);
+        assert!(result.is_ok());
+        assert_eq!(shell.get_tab_count(), 1);
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_handle_menu_action_close_tab() {
+        let mut shell = create_test_shell();
+        shell.create_tab().unwrap();
+        assert_eq!(shell.get_tab_count(), 1);
+
+        let result = shell.handle_menu_action(&MenuAction::CloseTab);
+        assert!(result.is_ok());
+        assert_eq!(shell.get_tab_count(), 0);
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_handle_menu_action_close_tab_no_active() {
+        let mut shell = create_test_shell();
+        assert_eq!(shell.get_tab_count(), 0);
+
+        // Should not error even when no tabs
+        let result = shell.handle_menu_action(&MenuAction::CloseTab);
+        assert!(result.is_ok());
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_handle_menu_action_quit() {
+        let mut shell = create_test_shell();
+        let result = shell.handle_menu_action(&MenuAction::Quit);
+        assert!(result.is_ok());
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_handle_menu_action_custom_handler() {
+        use std::sync::atomic::{AtomicBool, Ordering};
+
+        let mut shell = create_test_shell();
+        let called = Arc::new(AtomicBool::new(false));
+        let called_clone = called.clone();
+
+        let handler: crate::menu::EventHandler = Arc::new(move || {
+            called_clone.store(true, Ordering::SeqCst);
+            Ok(())
+        });
+
+        shell
+            .menu_bar_mut()
+            .register_handler(MenuAction::Copy, handler);
+
+        let result = shell.handle_menu_action(&MenuAction::Copy);
+        assert!(result.is_ok());
+        assert!(called.load(Ordering::SeqCst));
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_handle_menu_action_unhandled() {
+        let mut shell = create_test_shell();
+        let result = shell.handle_menu_action(&MenuAction::Copy);
+        assert!(result.is_err());
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_set_menu_item_enabled() {
+        let mut shell = create_test_shell();
+
+        let result = shell.set_menu_item_enabled("File", "New Tab", false);
+        assert!(result.is_ok());
+
+        let menu_bar = shell.menu_bar();
+        let file_menu = menu_bar.get_menu("File").unwrap();
+        let new_tab_item = file_menu.get_item("New Tab").unwrap();
+        assert!(!new_tab_item.enabled);
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_set_menu_item_enabled_invalid_menu() {
+        let mut shell = create_test_shell();
+
+        let result = shell.set_menu_item_enabled("Invalid", "New Tab", false);
+        assert!(result.is_err());
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_set_menu_item_enabled_invalid_item() {
+        let mut shell = create_test_shell();
+
+        let result = shell.set_menu_item_enabled("File", "Invalid", false);
+        assert!(result.is_err());
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_update_menu_states_no_tabs() {
+        let mut shell = create_test_shell();
+        shell.update_menu_states();
+
+        let menu_bar = shell.menu_bar();
+        let file_menu = menu_bar.get_menu("File").unwrap();
+        let close_tab_item = file_menu.get_item("Close Tab").unwrap();
+
+        // Close Tab should be disabled when no tabs
+        assert!(!close_tab_item.enabled);
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_update_menu_states_with_tabs() {
+        let mut shell = create_test_shell();
+        shell.create_tab().unwrap();
+        shell.update_menu_states();
+
+        let menu_bar = shell.menu_bar();
+        let file_menu = menu_bar.get_menu("File").unwrap();
+        let close_tab_item = file_menu.get_item("Close Tab").unwrap();
+
+        // Close Tab should be enabled when tabs exist
+        assert!(close_tab_item.enabled);
+    }
+
+    #[cfg(not(feature = "gui"))]
+    #[test]
+    fn test_menu_integration_workflow() {
+        use crate::menu::Shortcut;
+
+        let mut shell = create_test_shell();
+
+        // Find "New Tab" by shortcut
+        let shortcut = Shortcut::parse("Ctrl+T").unwrap();
+        let menu_bar = shell.menu_bar();
+        let item = menu_bar.find_item_by_shortcut(&shortcut);
+        assert!(item.is_some());
+        assert_eq!(item.unwrap().label, "New Tab");
+
+        // Trigger the action
+        let result = shell.handle_menu_action(&MenuAction::NewTab);
+        assert!(result.is_ok());
+        assert_eq!(shell.get_tab_count(), 1);
+
+        // Update menu states
+        shell.update_menu_states();
+
+        // Verify Close Tab is now enabled
+        let menu_bar = shell.menu_bar();
+        let file_menu = menu_bar.get_menu("File").unwrap();
+        let close_tab = file_menu.get_item("Close Tab").unwrap();
+        assert!(close_tab.enabled);
     }
 }

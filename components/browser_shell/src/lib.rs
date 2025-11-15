@@ -56,8 +56,17 @@
 //! ```
 
 pub mod errors;
+pub mod menu;
 pub mod types;
+pub mod ui_components;
 
 // Re-export main types for convenience
 pub use errors::{Error, Result};
+pub use menu::{
+    KeyCode, KeyModifier, Menu, MenuAction, MenuBar, MenuItem, MenuElement, Shortcut,
+};
 pub use types::{BrowserShell, Tab};
+pub use ui_components::{
+    NavigationButtons, SecurityState, StatusBar, TabBar, TabWidget, UiElement,
+    URLBar, ValidationState,
+};
