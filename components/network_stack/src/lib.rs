@@ -75,11 +75,16 @@
 
 pub mod cache;
 pub mod errors;
+pub mod request_handler;
 pub mod types;
 
 // Re-export main types for convenience
 pub use cache::{CacheControl, CacheEntry, HttpCache};
 pub use errors::{Error, Result};
+pub use request_handler::{
+    AdBlockInterceptor, HeaderInjectorInterceptor, HttpMethod, RedirectInterceptor, Request,
+    RequestAction, RequestHandler, RequestInterceptor, Response,
+};
 pub use types::{NetworkStack, ResourceTiming};
 
 #[cfg(test)]
