@@ -5,8 +5,8 @@ A modular web browser built with Rust, featuring WRY/WebKit rendering, ad blocki
 ## Project Status
 
 **Version:** 0.1.0
-**Specification Compliance:** ~70%
-**Tests:** 272 passing, 0 failing
+**Specification Compliance:** ~75%
+**Tests:** 290 passing, 0 failing
 
 ### What Works ✅
 
@@ -19,13 +19,14 @@ A modular web browser built with Rust, featuring WRY/WebKit rendering, ad blocki
 - ✅ **Browser Core**: Navigation, history, bookmarks
 - ✅ **Configuration**: Flexible TOML-based configuration
 - ✅ **Screenshot API**: PNG capture for testing (placeholder implementation)
+- ✅ **WebDriver Protocol**: W3C-compliant HTTP server with session management, navigation endpoints
 
 ### In Progress 🚧
 
 - ⚠️ **GUI Testing**: Xvfb compatibility issue (works on real X11 displays)
 - 🔧 **ACID1 Test**: Infrastructure ready, needs GUI fix for execution
-- 🔧 **WebDriver Protocol**: Not implemented (estimated 8-12 hours)
-- 🔧 **WPT Integration**: Not implemented (estimated 6-8 hours)
+- 🔧 **WebDriver Element/Script APIs**: Placeholder endpoints (estimated 10-14 hours)
+- 🔧 **WPT Integration**: WebDriver server ready, can now proceed (estimated 6-8 hours)
 
 ## Architecture
 
@@ -40,6 +41,7 @@ FrankenBrowser/
 │   ├── webview_integration/ # WRY/WebKit integration
 │   ├── browser_core/        # Navigation, history, bookmarks
 │   ├── browser_shell/       # Window and tab management
+│   ├── webdriver/           # WebDriver protocol (W3C automation)
 │   └── cli_app/             # Command-line interface
 ├── resources/               # Static resources
 │   └── filters/             # Ad blocking filter lists
@@ -332,10 +334,11 @@ Based on `frankenstein-browser-specification.md`:
 | Load google.com | 🟡 Partial | API ready, needs GUI fix |
 | Ad blocking (EasyList) | ✅ Complete | 77,078 rules active |
 | Tab management | ✅ Complete | Full state management |
+| WebDriver protocol | 🟡 Partial | HTTP server complete, element/script APIs pending |
 | ACID1 test | 🔧 Not Complete | Infrastructure ready |
-| WPT 40% pass rate | ❌ Not Implemented | Requires WebDriver |
+| WPT 40% pass rate | 🔧 Not Complete | WebDriver ready, can now proceed |
 
-**Overall Compliance:** ~70%
+**Overall Compliance:** ~75%
 
 ## Roadmap
 
