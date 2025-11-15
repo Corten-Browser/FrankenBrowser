@@ -4,6 +4,7 @@
 
 use crate::dom_interface::DomInterface;
 use crate::errors::{Error, Result, WebDriverErrorResponse};
+use crate::script_args::{parse_script_result, ScriptArgument};
 use crate::session::{Capabilities, SessionManager};
 use axum::{
     extract::{Path, State},
@@ -15,6 +16,7 @@ use axum::{
 use base64::Engine;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
+use tokio::time::{timeout, Duration};
 use tower_http::cors::{Any, CorsLayer};
 
 /// WebDriver server state
@@ -113,6 +115,10 @@ fn create_router(state: WebDriverState) -> Router {
         .route(
             "/session/:session_id/execute/sync",
             post(execute_script_handler),
+        )
+        .route(
+            "/session/:session_id/execute/async",
+            post(execute_async_script_handler),
         )
         // Screenshot endpoint
         .route(
@@ -534,15 +540,175 @@ async fn execute_script_handler(
 
     let session = session_arc.lock().unwrap();
 
+    // Convert JSON arguments to ScriptArguments
+    let script_args: Vec<ScriptArgument> = req
+        .args
+        .into_iter()
+        .map(ScriptArgument::from_json)
+        .collect();
+
+    // Build the full script with arguments injected
+    let full_script = if script_args.is_empty() {
+        // No arguments, execute script as-is
+        req.script.clone()
+    } else {
+        // Wrap script in function and inject arguments
+        let args_js = ScriptArgument::arguments_to_javascript(&script_args);
+        format!(
+            "(function() {{
+                var args = {};
+                return (function() {{ {} }}).apply(null, args);
+            }})()",
+            args_js,
+            req.script
+        )
+    };
+
     // Execute script using session's webview
-    let result_str = session.execute_script(&req.script)
+    let result_str = session
+        .execute_script(&full_script)
         .map_err(WebDriverError::from)?;
 
-    // Parse result as JSON value (or return as string if parsing fails)
-    let result = serde_json::from_str(&result_str)
-        .unwrap_or(serde_json::Value::String(result_str));
+    // Parse result using enhanced parser
+    let result = parse_script_result(&result_str).unwrap_or_else(|_| {
+        // Fallback: return as string if parsing fails
+        serde_json::Value::String(result_str)
+    });
 
     Ok(Json(ExecuteScriptResponse { value: result }))
+}
+
+/// POST /session/:session_id/execute/async - Execute JavaScript asynchronously with callback
+async fn execute_async_script_handler(
+    State(state): State<WebDriverState>,
+    Path(session_id): Path<String>,
+    Json(req): Json<ExecuteScriptRequest>,
+) -> WebDriverResult<Json<ExecuteScriptResponse>> {
+    let session_arc = state
+        .session_manager
+        .get_session(&session_id)
+        .map_err(WebDriverError::from)?;
+
+    // Get script timeout from session capabilities
+    let script_timeout = {
+        let session = session_arc.lock().unwrap();
+        session.capabilities.timeouts.script
+    };
+
+    // Convert JSON arguments to ScriptArguments
+    let script_args: Vec<ScriptArgument> = req
+        .args
+        .into_iter()
+        .map(ScriptArgument::from_json)
+        .collect();
+
+    // Prepare callback mechanism
+    // The callback is injected as the last argument (arguments[arguments.length])
+    // Per W3C WebDriver spec, the script must call this callback with the result
+    let _callback_id = uuid::Uuid::new_v4().to_string(); // Reserved for future use
+
+    // Build the async script wrapper
+    // This injects the callback function as the last argument
+    let args_js = ScriptArgument::arguments_to_javascript(&script_args);
+    let full_script = format!(
+        r#"(function() {{
+            // Store callback result
+            window.__webdriver_callback_result = undefined;
+            window.__webdriver_callback_called = false;
+
+            // Create callback function
+            var callback = function(result) {{
+                window.__webdriver_callback_result = result;
+                window.__webdriver_callback_called = true;
+            }};
+
+            // Prepare arguments array with callback at the end
+            var args = {};
+            args.push(callback);
+
+            // Execute user script with callback
+            try {{
+                (function() {{ {} }}).apply(null, args);
+            }} catch (e) {{
+                // If script throws, call callback with error
+                callback({{ error: e.toString() }});
+            }}
+        }})()"#,
+        args_js, req.script
+    );
+
+    // Execute the script (starts async execution)
+    {
+        let session = session_arc.lock().unwrap();
+        session
+            .execute_script(&full_script)
+            .map_err(WebDriverError::from)?;
+    }
+
+    // Poll for callback completion with timeout
+    let timeout_duration = Duration::from_millis(script_timeout);
+    let poll_result = timeout(timeout_duration, async {
+        // Poll every 100ms to check if callback was called
+        loop {
+            {
+                let session = session_arc.lock().unwrap();
+                let check_script = "window.__webdriver_callback_called === true";
+                let result = session.execute_script(check_script).ok();
+
+                if let Some(res) = result {
+                    if res.trim() == "true" {
+                        // Callback was called, get the result
+                        let get_result_script = "JSON.stringify(window.__webdriver_callback_result)";
+                        let result_str = session
+                            .execute_script(get_result_script)
+                            .map_err(|e| Error::JavaScriptError(e.to_string()))?;
+
+                        // Clean up callback state
+                        let cleanup_script = r#"
+                            delete window.__webdriver_callback_result;
+                            delete window.__webdriver_callback_called;
+                        "#;
+                        let _ = session.execute_script(cleanup_script);
+
+                        // Parse and return result
+                        let parsed_result = parse_script_result(&result_str).unwrap_or_else(|_| {
+                            serde_json::Value::String(result_str)
+                        });
+
+                        return Ok::<serde_json::Value, Error>(parsed_result);
+                    }
+                }
+            }
+
+            // Wait before next poll
+            tokio::time::sleep(Duration::from_millis(100)).await;
+        }
+    })
+    .await;
+
+    match poll_result {
+        Ok(result) => {
+            let value = result.map_err(WebDriverError::from)?;
+            Ok(Json(ExecuteScriptResponse { value }))
+        }
+        Err(_) => {
+            // Timeout occurred
+            // Clean up callback state
+            {
+                let session = session_arc.lock().unwrap();
+                let cleanup_script = r#"
+                    delete window.__webdriver_callback_result;
+                    delete window.__webdriver_callback_called;
+                "#;
+                let _ = session.execute_script(cleanup_script);
+            }
+
+            Err(WebDriverError::from(Error::ScriptTimeout(format!(
+                "Asynchronous script timeout after {}ms",
+                script_timeout
+            ))))
+        }
+    }
 }
 
 /// GET /session/:session_id/screenshot - Take screenshot
@@ -839,6 +1005,8 @@ impl IntoResponse for WebDriverError {
             "invalid argument" => StatusCode::BAD_REQUEST,
             "no such element" => StatusCode::NOT_FOUND,
             "no such window" => StatusCode::NOT_FOUND,
+            "script timeout" => StatusCode::REQUEST_TIMEOUT,
+            "timeout" => StatusCode::REQUEST_TIMEOUT,
             "unsupported operation" => StatusCode::NOT_IMPLEMENTED,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         };
@@ -896,7 +1064,7 @@ pub struct FindElementRequest {
 }
 
 /// Execute script request
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct ExecuteScriptRequest {
     pub script: String,
     pub args: Vec<serde_json::Value>,
@@ -1074,5 +1242,81 @@ mod tests {
         let json = serde_json::to_string(&status).unwrap();
         assert!(json.contains("ready"));
         assert!(json.contains("FrankenBrowser"));
+    }
+
+    // ============================================================================
+    // Script Execution Tests
+    // ============================================================================
+
+    #[test]
+    fn test_execute_script_request_with_args() {
+        use serde_json::json;
+
+        let req = ExecuteScriptRequest {
+            script: "return arguments[0] + arguments[1];".to_string(),
+            args: vec![json!(5), json!(3)],
+        };
+
+        let json = serde_json::to_string(&req).unwrap();
+        assert!(json.contains("arguments[0]"));
+        assert!(json.contains("args"));
+    }
+
+    #[test]
+    fn test_execute_script_request_no_args() {
+        use serde_json::json;
+
+        let req = ExecuteScriptRequest {
+            script: "return 42;".to_string(),
+            args: vec![],
+        };
+
+        let json = serde_json::to_string(&req).unwrap();
+        assert!(json.contains("return 42"));
+    }
+
+    #[test]
+    fn test_execute_script_request_with_element_arg() {
+        use serde_json::json;
+
+        let req = ExecuteScriptRequest {
+            script: "return arguments[0].tagName;".to_string(),
+            args: vec![json!({"element-6066-11e4-a52e-4f735466cecf": "elem-123"})],
+        };
+
+        let json = serde_json::to_string(&req).unwrap();
+        assert!(json.contains("element-6066-11e4-a52e-4f735466cecf"));
+    }
+
+    #[test]
+    fn test_execute_script_request_complex_args() {
+        use serde_json::json;
+
+        let req = ExecuteScriptRequest {
+            script: "return arguments[0].user.name;".to_string(),
+            args: vec![json!({
+                "user": {
+                    "name": "Alice",
+                    "age": 30
+                },
+                "active": true
+            })],
+        };
+
+        let json = serde_json::to_string(&req).unwrap();
+        assert!(json.contains("Alice"));
+    }
+
+    #[test]
+    fn test_execute_script_response_serialization() {
+        use serde_json::json;
+
+        let resp = ExecuteScriptResponse {
+            value: json!({"result": 42}),
+        };
+
+        let json = serde_json::to_string(&resp).unwrap();
+        assert!(json.contains("value"));
+        assert!(json.contains("42"));
     }
 }

@@ -186,7 +186,7 @@ pub fn get_webview_version() -> String {
     return windows::get_webview2_version();
 
     #[cfg(target_os = "macos")]
-    return "WKWebView (system version)".to_string();
+    return macos::get_wkwebview_version();
 
     #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
     return "Unknown".to_string();

@@ -10,14 +10,28 @@ publish = false
 name = "performance"
 harness = false
 
+[[bench]]
+name = "page_load"
+harness = false
+
+[[bench]]
+name = "tab_switching"
+harness = false
+
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
+httpmock = "0.7"
 
 # Workspace dependencies needed for benchmarks
 shared-types = { path = "../components/shared_types" }
 message-bus = { path = "../components/message_bus" }
 config-manager = { path = "../components/config_manager" }
 adblock-engine = { path = "../components/adblock_engine" }
+browser-shell = { path = "../components/browser_shell" }
+browser-core = { path = "../components/browser_core" }
+network-stack = { path = "../components/network_stack" }
+webview-integration = { path = "../components/webview_integration" }
 serde.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
+url.workspace = true

@@ -50,6 +50,7 @@
 pub mod dom_interface;
 pub mod element;
 pub mod errors;
+pub mod script_args;
 pub mod server;
 pub mod session;
 

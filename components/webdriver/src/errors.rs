@@ -28,6 +28,9 @@ pub enum Error {
     #[error("Timeout: {0}")]
     Timeout(String),
 
+    #[error("Script timeout: {0}")]
+    ScriptTimeout(String),
+
     #[error("Unable to capture screenshot: {0}")]
     ScreenshotError(String),
 
@@ -67,6 +70,7 @@ impl From<Error> for WebDriverErrorResponse {
             Error::NoSuchWindow(_) => "no such window",
             Error::JavaScriptError(_) => "javascript error",
             Error::Timeout(_) => "timeout",
+            Error::ScriptTimeout(_) => "script timeout",
             Error::ScreenshotError(_) => "unable to capture screenshot",
             Error::NavigationError(_) => "unknown error",
             Error::ServerError(_) => "unknown error",
