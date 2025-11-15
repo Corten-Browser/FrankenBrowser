@@ -10,6 +10,7 @@ members = [
     "components/browser_core",
     "components/webview_integration",
     "components/browser_shell",
+    "components/webdriver",
     "components/cli_app",
     "integration_tests",
     "benchmarks",

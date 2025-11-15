@@ -28,6 +28,9 @@ pub enum Error {
     #[error("Runtime error: {0}")]
     RuntimeError(String),
 
+    #[error("Initialization error: {0}")]
+    Initialization(String),
+
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

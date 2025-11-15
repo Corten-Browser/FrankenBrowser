@@ -19,6 +19,9 @@ pub enum Error {
     #[error("Platform-specific error: {0}")]
     Platform(String),
 
+    #[error("Screenshot error: {0}")]
+    Screenshot(String),
+
     #[error("Not implemented yet")]
     NotImplemented,
 }

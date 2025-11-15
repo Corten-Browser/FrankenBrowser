@@ -19,13 +19,15 @@ thiserror = "1.0"
 tokio = { version = "1.35", features = ["full"] }
 
 # GUI dependencies - optional for headless environments
-tao = { version = "0.25", optional = true }
+# Using latest wry with webkit2gtk-4.1 support
+wry = { version = "0.53", optional = true, default-features = false, features = ["linux-body", "protocol"] }
+tao = { version = "0.34", optional = true }
 egui = { version = "0.24", optional = true }
 eframe = { version = "0.24", optional = true }
 
 [features]
 default = []
-gui = ["tao", "egui", "eframe"]
+gui = ["wry", "tao", "egui", "eframe"]
 
 [dev-dependencies]
 tokio = { version = "1.35", features = ["test-util", "macros"] }

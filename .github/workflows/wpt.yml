@@ -1,0 +1,91 @@
+name: Web Platform Tests
+
+on:
+  workflow_dispatch:  # Manual trigger only
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  wpt-phase1:
+    name: WPT Phase 1 Subset
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libwebkit2gtk-4.1-dev \
+          libgtk-3-dev \
+          python3 \
+          python3-pip \
+          python3-venv \
+          xvfb
+
+    - name: Build WebDriver server
+      run: cargo build --release --bin webdriver-server
+
+    - name: Clone WPT repository
+      run: |
+        if [ ! -d "wpt" ]; then
+          git clone --depth=1 https://github.com/web-platform-tests/wpt.git
+        fi
+
+    - name: Set up Python environment
+      run: |
+        cd wpt
+        python3 -m venv tools/wptrunner/venv
+        source tools/wptrunner/venv/bin/activate
+        pip install -e tools/wptrunner
+
+    - name: Run WPT Phase 1 tests
+      run: |
+        # Start Xvfb
+        Xvfb :99 -screen 0 1280x1024x24 &
+        export DISPLAY=:99
+
+        cd wpt
+        source tools/wptrunner/venv/bin/activate
+
+        # Run limited test subset for Phase 1
+        python3 tools/wptrunner/wptrunner \
+          --product=webdriver \
+          --webdriver-binary=../target/release/webdriver-server \
+          --webdriver-port=4444 \
+          --include=html/browsers/browsing-the-web/navigating-across-documents/navigate.html \
+          --log-raw=../tests/wpt/results/wpt-results.json \
+          2>&1 | tee ../tests/wpt/logs/wpt-run.log || true
+
+    - name: Analyze results
+      if: always()
+      run: |
+        if [ -f tests/wpt/results/wpt-results.json ]; then
+          python3 tests/wpt/analyze_results.py tests/wpt/results/wpt-results.json
+        fi
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: wpt-results
+        path: |
+          tests/wpt/results/
+          tests/wpt/logs/
+        retention-days: 30
+
+    - name: Check pass rate
+      if: always()
+      run: |
+        if [ -f tests/wpt/results/wpt-results.json ]; then
+          echo "WPT Phase 1 results available"
+          # Future: Add pass rate check here
+        fi

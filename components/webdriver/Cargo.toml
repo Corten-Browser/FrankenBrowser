@@ -1,0 +1,52 @@
+[package]
+name = "webdriver"
+version = "0.1.0"
+edition = "2021"
+authors = ["Browser Team"]
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# Core dependencies
+shared-types = { path = "../shared_types" }
+message-bus = { path = "../message_bus" }
+browser-core = { path = "../browser_core" }
+webview-integration = { path = "../webview_integration" }
+
+# Web server
+tokio = { version = "1.35", features = ["full"] }
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors"] }
+hyper = "1.0"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# UUID for session IDs
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# URL parsing
+url = "2.5"
+
+# Base64 encoding
+base64 = "0.21"
+
+[dev-dependencies]
+tokio-test = "0.4"
+reqwest = "0.11"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "webdriver-server"
+path = "src/bin/webdriver_server.rs"
