@@ -3,7 +3,6 @@
 //! This module provides the W3C WebDriver protocol HTTP server using axum.
 
 use crate::dom_interface::DomInterface;
-use crate::element::ElementReference as ElementRef;
 use crate::errors::{Error, Result, WebDriverErrorResponse};
 use crate::session::{Capabilities, SessionManager};
 use axum::{
@@ -237,7 +236,7 @@ async fn find_element_handler(
         .get_session(&session_id)
         .map_err(WebDriverError::from)?;
 
-    let mut session = session_arc.lock().unwrap();
+    let session = session_arc.lock().unwrap();
 
     // Use DomInterface to find element
     let dom = DomInterface::new();
@@ -270,7 +269,7 @@ async fn find_elements_handler(
         .get_session(&session_id)
         .map_err(WebDriverError::from)?;
 
-    let mut session = session_arc.lock().unwrap();
+    let session = session_arc.lock().unwrap();
 
     // Use DomInterface to find elements
     let dom = DomInterface::new();
