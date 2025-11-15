@@ -16,6 +16,14 @@ members = [
     "benchmarks",
 ]
 
+[package]
+name = "frankenbrowser"
+version = "0.1.0"
+edition = "2021"
+authors = ["Browser Team"]
+license = "MIT OR Apache-2.0"
+publish = false
+
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
@@ -43,6 +51,9 @@ adblock = "0.8"
 # Database
 rusqlite = { version = "0.30", features = ["bundled"] }
 
+# Base64 encoding/decoding
+base64 = "0.21"
+
 # IPC
 crossbeam-channel = "0.5"
 
@@ -54,6 +65,12 @@ eframe = "0.24"
 
 # Config
 toml = "0.8"
+
+[build-dependencies]
+reqwest = { version = "0.11", features = ["blocking"] }
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
 
 [profile.dev]
 opt-level = 0

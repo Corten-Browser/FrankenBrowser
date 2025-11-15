@@ -14,6 +14,18 @@
 //! - message_bus
 //! - config_manager
 //!
+//! # Features
+//!
+//! - **HTTP Client**: GET, POST, PUT, DELETE requests with timeout and compression support
+//! - **HTTP Caching**: RFC 7234 compliant caching with LRU eviction
+//!   - In-memory cache with configurable size limits
+//!   - Optional disk-based cache using SQLite (planned)
+//!   - Cache-Control header parsing (max-age, no-cache, no-store, must-revalidate)
+//!   - ETag and Last-Modified support for conditional requests (planned)
+//!   - Automatic cache invalidation on POST/PUT/DELETE requests
+//! - **Cookie Management**: Automatic cookie store
+//! - **Performance Tracking**: Resource timing data collection
+//!
 //! # Usage
 //!
 //! ```no_run
@@ -28,36 +40,45 @@
 //! bus.start().unwrap();
 //! let sender = bus.sender();
 //!
-//! // Create network config
+//! // Create network config with caching enabled
 //! let config = NetworkConfig {
 //!     max_connections_per_host: 6,
 //!     timeout_seconds: 30,
 //!     enable_cookies: true,
 //!     enable_cache: true,
-//!     cache_size_mb: 500,
+//!     cache_size_mb: 500,  // 500MB cache
 //! };
 //!
 //! // Create and initialize network stack
 //! let mut stack = NetworkStack::new(config, sender)?;
 //! stack.initialize()?;
 //!
-//! // Fetch a resource
+//! // Fetch a resource (first request - network)
 //! let url = Url::parse("https://example.com").unwrap();
-//! let data = stack.fetch(url).await?;
+//! let data = stack.fetch(url.clone()).await?;
+//!
+//! // Fetch again (cache hit - if cacheable)
+//! let data2 = stack.fetch(url).await?;
 //!
 //! // Get timing data
 //! let timings = stack.get_timing_data();
 //! for timing in timings {
-//!     println!("Fetched {} in {}ms", timing.url, timing.duration_ms);
+//!     println!("Fetched {} in {}ms (cache: {})",
+//!              timing.url, timing.duration_ms, timing.from_cache);
 //! }
+//!
+//! // Clear cache
+//! stack.clear_cache();
 //! # Ok(())
 //! # }
 //! ```
 
+pub mod cache;
 pub mod errors;
 pub mod types;
 
 // Re-export main types for convenience
+pub use cache::{CacheControl, CacheEntry, HttpCache};
 pub use errors::{Error, Result};
 pub use types::{NetworkStack, ResourceTiming};
 
