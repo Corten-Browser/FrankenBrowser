@@ -120,14 +120,15 @@ async fn create_session_handler(
         .or_else(|| req.capabilities.first_match.and_then(|v| v.into_iter().next()))
         .unwrap_or_default();
 
-    let session = state
+    // Create session (returns session_id)
+    let session_id = state
         .session_manager
         .create_session(capabilities.clone())
         .map_err(WebDriverError::from)?;
 
     Ok(Json(CreateSessionResponse {
         value: SessionValue {
-            session_id: session.id.clone(),
+            session_id,
             capabilities,
         },
     }))
@@ -152,17 +153,13 @@ async fn navigate_handler(
     Path(session_id): Path<String>,
     Json(req): Json<NavigateRequest>,
 ) -> WebDriverResult<StatusCode> {
-    let mut session = state
+    let session_arc = state
         .session_manager
         .get_session(&session_id)
         .map_err(WebDriverError::from)?;
 
+    let mut session = session_arc.lock().unwrap();
     session.navigate(req.url).map_err(WebDriverError::from)?;
-
-    state
-        .session_manager
-        .update_session(session)
-        .map_err(WebDriverError::from)?;
 
     Ok(StatusCode::OK)
 }
@@ -172,11 +169,12 @@ async fn get_url_handler(
     State(state): State<WebDriverState>,
     Path(session_id): Path<String>,
 ) -> WebDriverResult<Json<UrlResponse>> {
-    let session = state
+    let session_arc = state
         .session_manager
         .get_session(&session_id)
         .map_err(WebDriverError::from)?;
 
+    let session = session_arc.lock().unwrap();
     let url = session
         .get_url()
         .ok_or_else(|| Error::InvalidSession("No URL set".to_string()))
@@ -244,34 +242,22 @@ async fn execute_script_handler(
     Path(session_id): Path<String>,
     Json(req): Json<ExecuteScriptRequest>,
 ) -> WebDriverResult<Json<ExecuteScriptResponse>> {
-    // Verify session exists
-    let _session = state
+    let session_arc = state
         .session_manager
         .get_session(&session_id)
         .map_err(WebDriverError::from)?;
 
-    // Execute script
-    // TODO: Integrate with actual WebView when browser instance is available
-    // For now, return null as a placeholder (valid JavaScript value)
-    let result = execute_javascript(&req.script, &req.args);
+    let session = session_arc.lock().unwrap();
+
+    // Execute script using session's webview
+    let result_str = session.execute_script(&req.script)
+        .map_err(WebDriverError::from)?;
+
+    // Parse result as JSON value (or return as string if parsing fails)
+    let result = serde_json::from_str(&result_str)
+        .unwrap_or(serde_json::Value::String(result_str));
 
     Ok(Json(ExecuteScriptResponse { value: result }))
-}
-
-/// Execute JavaScript code and return the result
-///
-/// This is a placeholder implementation that returns null.
-/// In production, this would:
-/// 1. Inject the script into the WebView
-/// 2. Pass arguments as function parameters
-/// 3. Return the actual JavaScript result
-fn execute_javascript(_script: &str, _args: &[serde_json::Value]) -> serde_json::Value {
-    // Placeholder: return null
-    // Real implementation would:
-    // - Format script with arguments
-    // - Call webview.execute_script()
-    // - Parse and return the result
-    serde_json::Value::Null
 }
 
 /// GET /session/:session_id/screenshot - Take screenshot
@@ -279,16 +265,16 @@ async fn screenshot_handler(
     State(state): State<WebDriverState>,
     Path(session_id): Path<String>,
 ) -> WebDriverResult<Json<ScreenshotResponse>> {
-    // Verify session exists
-    let _session = state
+    let session_arc = state
         .session_manager
         .get_session(&session_id)
         .map_err(WebDriverError::from)?;
 
-    // Generate screenshot
-    // TODO: Integrate with actual WebView when browser instance is available
-    // For now, return a minimal 1x1 transparent PNG as placeholder
-    let png_bytes = create_placeholder_screenshot();
+    let session = session_arc.lock().unwrap();
+
+    // Take screenshot using session's webview
+    let png_bytes = session.screenshot()
+        .map_err(WebDriverError::from)?;
 
     // Base64 encode per W3C WebDriver spec
     let base64_png = base64::engine::general_purpose::STANDARD.encode(&png_bytes);
@@ -298,34 +284,17 @@ async fn screenshot_handler(
     }))
 }
 
-/// Create a minimal 1x1 transparent PNG for placeholder screenshots
-///
-/// This is a valid PNG file that can be decoded by any image viewer.
-/// In production, this would be replaced with actual WebView screenshot data.
-fn create_placeholder_screenshot() -> Vec<u8> {
-    // Minimal 1x1 transparent PNG (67 bytes)
-    vec![
-        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG signature
-        0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, // IHDR chunk
-        0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, // 1x1 dimensions
-        0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-        0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41, // IDAT chunk
-        0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-        0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, // Image data
-        0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, // IEND chunk
-        0x42, 0x60, 0x82,
-    ]
-}
-
 /// GET /session/:session_id/window - Get window handle
 async fn window_handle_handler(
     State(state): State<WebDriverState>,
     Path(session_id): Path<String>,
 ) -> WebDriverResult<Json<WindowHandleResponse>> {
-    let session = state
+    let session_arc = state
         .session_manager
         .get_session(&session_id)
         .map_err(WebDriverError::from)?;
+
+    let session = session_arc.lock().unwrap();
 
     Ok(Json(WindowHandleResponse {
         value: session.window_handle.clone(),

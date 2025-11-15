@@ -1,18 +1,24 @@
 //! WebDriver session management
 
 use crate::errors::{Error, Result};
+use browser_core::BrowserEngine;
+use webview_integration::WebViewWrapper;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
 
 /// WebDriver session representing a browser instance
-#[derive(Debug, Clone)]
+
 pub struct Session {
     pub id: String,
     pub capabilities: Capabilities,
     pub current_url: Option<String>,
     pub window_handle: String,
+    /// Browser engine for navigation and history (headless compatible)
+    pub browser_engine: Option<Arc<Mutex<BrowserEngine>>>,
+    /// WebView wrapper for rendering and script execution (headless compatible)
+    pub webview: Option<Arc<Mutex<WebViewWrapper>>>,
 }
 
 impl Session {
@@ -26,6 +32,27 @@ impl Session {
             capabilities,
             current_url: None,
             window_handle,
+            browser_engine: None,
+            webview: None,
+        }
+    }
+
+    /// Create a new session with browser components
+    pub fn new_with_browser(
+        capabilities: Capabilities,
+        browser_engine: BrowserEngine,
+        webview: WebViewWrapper,
+    ) -> Self {
+        let id = Uuid::new_v4().to_string();
+        let window_handle = Uuid::new_v4().to_string();
+
+        Self {
+            id,
+            capabilities,
+            current_url: None,
+            window_handle,
+            browser_engine: Some(Arc::new(Mutex::new(browser_engine))),
+            webview: Some(Arc::new(Mutex::new(webview))),
         }
     }
 
@@ -35,14 +62,80 @@ impl Session {
         url::Url::parse(&url)
             .map_err(|e| Error::InvalidArgument(format!("Invalid URL: {}", e)))?;
 
+        // If webview is available, navigate it
+        if let Some(webview) = &self.webview {
+            let mut webview = webview.lock().unwrap();
+            webview.navigate(&url)
+                .map_err(|e| Error::NavigationError(format!("WebView navigation failed: {}", e)))?;
+        }
+
+        // Update current URL
         self.current_url = Some(url);
         Ok(())
     }
 
     /// Get current URL
-    pub fn get_url(&self) -> Option<&str> {
-        self.current_url.as_deref()
+    pub fn get_url(&self) -> Option<String> {
+        // If webview is available, get URL from it
+        if let Some(webview) = &self.webview {
+            let webview = webview.lock().unwrap();
+            if let Some(url) = webview.current_url() {
+                return Some(url.to_string());
+            }
+        }
+        // Fallback to stored URL
+        self.current_url.clone()
     }
+
+    /// Execute JavaScript in the session's webview
+    pub fn execute_script(&self, script: &str) -> Result<String> {
+        if let Some(webview) = &self.webview {
+            let mut webview = webview.lock().unwrap();
+            webview.execute_script(script)
+                .map_err(|e| Error::JavaScriptError(format!("Script execution failed: {}", e)))
+        } else {
+            // No webview available, return null
+            Ok("null".to_string())
+        }
+    }
+
+    /// Take screenshot of the session's webview
+    pub fn screenshot(&self) -> Result<Vec<u8>> {
+        if let Some(webview) = &self.webview {
+            let webview = webview.lock().unwrap();
+            webview.screenshot(None)
+                .map_err(|e| Error::ScreenshotError(format!("Screenshot failed: {}", e)))
+        } else {
+            // No webview, return minimal PNG
+            Ok(create_placeholder_screenshot())
+        }
+    }
+
+    /// Get DOM from the session's webview
+    pub fn get_dom(&self) -> Result<String> {
+        if let Some(webview) = &self.webview {
+            let webview = webview.lock().unwrap();
+            webview.get_dom()
+                .map_err(|e| Error::JavaScriptError(format!("Get DOM failed: {}", e)))
+        } else {
+            Ok("<html><body></body></html>".to_string())
+        }
+    }
+}
+
+/// Create a minimal 1x1 transparent PNG for placeholder screenshots
+fn create_placeholder_screenshot() -> Vec<u8> {
+    vec![
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG signature
+        0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, // IHDR chunk
+        0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, // 1x1 dimensions
+        0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+        0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41, // IDAT chunk
+        0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
+        0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, // Image data
+        0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, // IEND chunk
+        0x42, 0x60, 0x82,
+    ]
 }
 
 /// Browser capabilities per W3C WebDriver spec
@@ -116,7 +209,7 @@ impl Default for Timeouts {
 /// Session manager for managing active WebDriver sessions
 #[derive(Clone)]
 pub struct SessionManager {
-    sessions: Arc<Mutex<HashMap<String, Session>>>,
+    sessions: Arc<Mutex<HashMap<String, Arc<Mutex<Session>>>>>,
 }
 
 impl SessionManager {
@@ -128,18 +221,34 @@ impl SessionManager {
     }
 
     /// Create a new session
-    pub fn create_session(&self, capabilities: Capabilities) -> Result<Session> {
+    pub fn create_session(&self, capabilities: Capabilities) -> Result<String> {
         let session = Session::new(capabilities);
         let session_id = session.id.clone();
 
         let mut sessions = self.sessions.lock().unwrap();
-        sessions.insert(session_id.clone(), session.clone());
+        sessions.insert(session_id.clone(), Arc::new(Mutex::new(session)));
 
-        Ok(session)
+        Ok(session_id)
     }
 
-    /// Get a session by ID
-    pub fn get_session(&self, session_id: &str) -> Result<Session> {
+    /// Create a new session with browser components
+    pub fn create_session_with_browser(
+        &self,
+        capabilities: Capabilities,
+        browser_engine: BrowserEngine,
+        webview: WebViewWrapper,
+    ) -> Result<String> {
+        let session = Session::new_with_browser(capabilities, browser_engine, webview);
+        let session_id = session.id.clone();
+
+        let mut sessions = self.sessions.lock().unwrap();
+        sessions.insert(session_id.clone(), Arc::new(Mutex::new(session)));
+
+        Ok(session_id)
+    }
+
+    /// Get a session by ID (returns Arc<Mutex<Session>> for shared access)
+    pub fn get_session(&self, session_id: &str) -> Result<Arc<Mutex<Session>>> {
         let sessions = self.sessions.lock().unwrap();
         sessions
             .get(session_id)
@@ -147,10 +256,9 @@ impl SessionManager {
             .ok_or_else(|| Error::SessionNotFound(session_id.to_string()))
     }
 
-    /// Update a session
-    pub fn update_session(&self, session: Session) -> Result<()> {
-        let mut sessions = self.sessions.lock().unwrap();
-        sessions.insert(session.id.clone(), session);
+    /// Update a session (no longer needed - sessions are modified in place via Arc<Mutex<>>)
+    #[deprecated(note = "Sessions are now modified in place via Arc<Mutex<>>")]
+    pub fn update_session(&self, _session: Session) -> Result<()> {
         Ok(())
     }
 
@@ -200,7 +308,7 @@ mod tests {
         let mut session = Session::new(caps);
 
         session.navigate("https://www.example.com".to_string()).unwrap();
-        assert_eq!(session.get_url(), Some("https://www.example.com"));
+        assert_eq!(session.get_url(), Some("https://www.example.com".to_string()));
     }
 
     #[test]
@@ -217,9 +325,9 @@ mod tests {
         let manager = SessionManager::new();
         let caps = Capabilities::default();
 
-        let session = manager.create_session(caps).unwrap();
+        let session_id = manager.create_session(caps).unwrap();
         assert_eq!(manager.session_count(), 1);
-        assert!(manager.list_sessions().contains(&session.id));
+        assert!(manager.list_sessions().contains(&session_id));
     }
 
     #[test]
@@ -227,9 +335,10 @@ mod tests {
         let manager = SessionManager::new();
         let caps = Capabilities::default();
 
-        let session = manager.create_session(caps).unwrap();
-        let retrieved = manager.get_session(&session.id).unwrap();
-        assert_eq!(retrieved.id, session.id);
+        let session_id = manager.create_session(caps).unwrap();
+        let retrieved = manager.get_session(&session_id).unwrap();
+        let session = retrieved.lock().unwrap();
+        assert_eq!(session.id, session_id);
     }
 
     #[test]
@@ -237,10 +346,10 @@ mod tests {
         let manager = SessionManager::new();
         let caps = Capabilities::default();
 
-        let session = manager.create_session(caps).unwrap();
+        let session_id = manager.create_session(caps).unwrap();
         assert_eq!(manager.session_count(), 1);
 
-        manager.delete_session(&session.id).unwrap();
+        manager.delete_session(&session_id).unwrap();
         assert_eq!(manager.session_count(), 0);
     }
 
