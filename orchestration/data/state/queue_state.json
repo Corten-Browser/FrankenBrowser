@@ -1,9 +1,11 @@
 {
+  "tasks": [],
+  "completed_order": [],
+  "last_updated": "2025-11-23T23:12:23.834269",
+  "initialized": true,
   "spec_file": "specifications/frankenstein-browser-specification.md",
-  "queue_initialized": true,
-  "last_sync": "2025-11-23T23:12:23.834911",
-  "task_count": 0,
   "spec_files": [
     "specifications/frankenstein-browser-specification.md"
-  ]
+  ],
+  "total_features": 0
 }

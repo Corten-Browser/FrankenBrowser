@@ -1,0 +1,18 @@
+{
+  "last_extraction": "2025-11-23T23:12:23.835107",
+  "extraction_method": "pending-llm",
+  "spec_files": [
+    {
+      "path": "specifications/frankenstein-browser-specification.md",
+      "features_extracted": 0,
+      "extraction_method": "none",
+      "last_processed": "2025-11-23T23:12:23.835169"
+    }
+  ],
+  "total_features": 0,
+  "automated_features": 0,
+  "llm_features": 0,
+  "llm_extraction_complete": false,
+  "llm_extraction_timestamp": null,
+  "automated_extraction_success": false
+}
