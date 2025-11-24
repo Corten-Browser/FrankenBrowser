@@ -4,7 +4,7 @@
       "id": "FEAT-001",
       "name": "Project setup and dependency configuration",
       "description": "Initialize Rust project with Cargo.toml containing all required dependencies (wry, tao, reqwest, adblock, tokio, egui, serde, rusqlite, etc.)",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 1",
       "priority": "high",
       "extraction_method": "llm",
@@ -15,15 +15,15 @@
       "source_section": "Implementation Milestones - Week 1",
       "dependencies": [],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: Cargo.toml (root workspace)"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-002",
       "name": "Message bus implementation",
       "description": "Implement message bus system with BrowserMessage enum supporting navigation, network, adblock, and tab messages. Use crossbeam-channel for IPC.",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 1",
       "priority": "high",
       "extraction_method": "llm",
@@ -40,15 +40,15 @@
         "All message types handled"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/message_bus/src/lib.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-003",
       "name": "Browser shell with WRY integration",
       "description": "Create browser shell using WRY for WebView integration. Window opens, displays content, handles IPC messages.",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 1",
       "priority": "high",
       "extraction_method": "llm",
@@ -71,15 +71,15 @@
         "IPC handler functional"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/browser_shell/src/lib.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-004",
       "name": "Tab manager implementation",
       "description": "Implement tab management system supporting create, close, and switch operations. Track active tabs per window.",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 1",
       "priority": "high",
       "extraction_method": "llm",
@@ -99,15 +99,15 @@
         "Tab switching latency < 100ms"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/browser_shell/src/types.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-005",
       "name": "UI components - URL bar and controls",
       "description": "Implement browser UI components: URL bar with input, navigation controls (back, forward, reload, stop)",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 1",
       "priority": "medium",
       "extraction_method": "llm",
@@ -131,15 +131,15 @@
         "Toolbar renders correctly"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/browser_shell/src/ui_components.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-006",
       "name": "Menu system",
       "description": "Implement browser menu bar with File, Edit, View menus and standard keyboard shortcuts",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 1",
       "priority": "low",
       "extraction_method": "llm",
@@ -156,15 +156,15 @@
         "Keyboard shortcuts (Ctrl+T, Ctrl+W)"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/browser_shell/src/menu.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-007",
       "name": "HTTP client implementation",
       "description": "Implement HTTP client using reqwest with cookie support, gzip/brotli compression, connection pooling, and 30-second timeout",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "high",
       "extraction_method": "llm",
@@ -189,15 +189,15 @@
         "Connection pooling active"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/network_stack/src/lib.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-008",
       "name": "Request handler",
       "description": "Implement request handler that coordinates HTTP requests with message bus and ad blocker integration",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "high",
       "extraction_method": "llm",
@@ -216,15 +216,15 @@
         "Reports errors via message bus"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/network_stack/src/request_handler.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-009",
       "name": "Network cache system",
       "description": "Implement HTTP response cache with configurable size (default 500MB)",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "medium",
       "extraction_method": "llm",
@@ -241,15 +241,15 @@
         "Cache invalidation works"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/network_stack/src/cache.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-010",
       "name": "Cookie management",
       "description": "Implement cookie storage with per-origin isolation using cookie_store crate",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "medium",
       "extraction_method": "llm",
@@ -268,15 +268,15 @@
         "Block third-party cookies (configurable)"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/network_stack (enable_cookies config)"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-011",
       "name": "Ad blocker filter engine",
       "description": "Implement ad blocking using adblock crate with EasyList filter loading",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "high",
       "extraction_method": "llm",
@@ -297,15 +297,15 @@
         "Block ads on major websites"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/adblock_engine/src/lib.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-012",
       "name": "Ad block rule loader",
       "description": "Load and parse filter rules from EasyList file in resources/filters/",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "medium",
       "extraction_method": "llm",
@@ -321,15 +321,15 @@
         "Support custom filters configuration"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: build.rs + components/adblock_engine/resources/filters/"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-013",
       "name": "Element hider for cosmetic filtering",
       "description": "Implement cosmetic filtering to hide ad elements in DOM",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "low",
       "extraction_method": "llm",
@@ -345,15 +345,15 @@
         "Support EasyList cosmetic rules"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:50:00.000000Z",
-      "completion_method": "resume_verification",
-      "reconciliation_notes": "Verified via /orchestrate --resume. Location: components/adblock_engine/src/types.rs:212 - get_cosmetic_filters() method with url_cosmetic_resources() and hide_selectors support"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-014",
       "name": "WebView wrapper",
       "description": "Create WebView abstraction wrapper over platform WebViews (webkit2gtk, webview2, cocoa)",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "high",
       "extraction_method": "llm",
@@ -370,15 +370,15 @@
         "Handle WebView events"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/webview_integration/src/lib.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-015",
       "name": "JavaScript bridge for IPC",
       "description": "Implement JavaScript bridge for communication between WebView and Rust backend",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "medium",
       "extraction_method": "llm",
@@ -395,15 +395,15 @@
         "Handle IPC messages"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/webview_integration/src/javascript_bridge.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-016",
       "name": "Linux platform support",
       "description": "Implement Linux-specific WebView using webkit2gtk",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "high",
       "extraction_method": "llm",
@@ -423,15 +423,15 @@
         "JavaScript execution works"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/webview_integration/src/platform/linux.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-017",
       "name": "Windows platform support",
       "description": "Implement Windows-specific WebView using WebView2",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "medium",
       "extraction_method": "llm",
@@ -451,15 +451,15 @@
         "JavaScript execution works"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/webview_integration/src/platform/windows.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-018",
       "name": "macOS platform support",
       "description": "Implement macOS-specific WebView using Cocoa/WKWebView",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 2",
       "priority": "medium",
       "extraction_method": "llm",
@@ -479,15 +479,15 @@
         "JavaScript execution works"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/webview_integration/src/platform/macos.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-019",
       "name": "Navigation system",
       "description": "Implement navigation with back, forward, reload, and stop functionality",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "high",
       "extraction_method": "llm",
@@ -505,15 +505,15 @@
         "Stop loading"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/browser_core/src/navigation.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-020",
       "name": "History management",
       "description": "Implement browser history storage using rusqlite SQLite database",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
       "extraction_method": "llm",
@@ -535,15 +535,15 @@
         "History persists across sessions"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/browser_core/src/types.rs (HistoryEntry)"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-021",
       "name": "Bookmarks management",
       "description": "Implement bookmarks storage and management using SQLite",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
       "extraction_method": "llm",
@@ -562,15 +562,15 @@
         "Bookmarks persist across sessions"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/browser_core/src/types.rs (Bookmark)"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-022",
       "name": "Configuration system",
       "description": "Implement configuration loading from TOML files with default settings",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
       "extraction_method": "llm",
@@ -591,15 +591,15 @@
         "Support homepage, search engine, privacy settings"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/config_manager/src/lib.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-023",
       "name": "Logging system",
       "description": "Implement logging using tracing crate with subscriber configuration",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 1",
       "priority": "medium",
       "extraction_method": "llm",
@@ -621,15 +621,15 @@
         "Structured logging output"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: Cargo.toml workspace deps (tracing, tracing-subscriber)"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-024",
       "name": "Error handling utilities",
       "description": "Implement error handling using anyhow and thiserror crates",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 1",
       "priority": "medium",
       "extraction_method": "llm",
@@ -649,15 +649,15 @@
         "Custom error types where needed"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: Each component has errors.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-025",
       "name": "Browser engine core",
       "description": "Implement BrowserApp struct coordinating all components (shell, message_bus, network, adblock)",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 1",
       "priority": "high",
       "extraction_method": "llm",
@@ -673,15 +673,15 @@
         "Clean shutdown on exit"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/browser_core/src/lib.rs (BrowserEngine)"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-026",
       "name": "WPT test harness integration",
       "description": "Implement Web Platform Tests harness for browser compatibility testing",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
       "extraction_method": "llm",
@@ -699,15 +699,15 @@
         "40% WPT pass rate for Phase 1"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: tests/wpt/"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-027",
       "name": "ACID1 test compliance",
       "description": "Ensure browser passes ACID1 test (basic CSS1 box model)",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "high",
       "extraction_method": "llm",
@@ -723,15 +723,15 @@
         "Test automated in CI"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: tests/acid1_test.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-028",
       "name": "Performance benchmarks",
       "description": "Implement performance benchmarking using criterion crate",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "low",
       "extraction_method": "llm",
@@ -748,15 +748,15 @@
         "Regression detection"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: benchmarks/benches/"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-029",
       "name": "Test result tracking database",
       "description": "Implement SQLite database for storing test results and performance metrics",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "low",
       "extraction_method": "llm",
@@ -774,15 +774,15 @@
         "Query historical data"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: tests/infrastructure/test_recorder.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-030",
       "name": "Basic navigation validation - google.com",
       "description": "Validate browser can navigate to and display google.com correctly",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "high",
       "extraction_method": "llm",
@@ -799,15 +799,15 @@
         "Search input visible"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:55:00.000000Z",
-      "completion_method": "validation_tests",
-      "reconciliation_notes": "Validation tests created in tests/validation/navigation.rs - validates URL parsing, protocol detection, and Navigator functionality for google.com and other URLs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-031",
       "name": "Performance target - page load under 3 seconds",
       "description": "Ensure page loads complete within 3 seconds on broadband connection",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
       "extraction_method": "llm",
@@ -823,15 +823,15 @@
         "Includes common websites"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:55:00.000000Z",
-      "completion_method": "validation_tests",
-      "reconciliation_notes": "Validation tests created in tests/validation/performance.rs - validates 3-second page load target constant, timing infrastructure, network config timeout, and ResourceTiming structure"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-032",
       "name": "Memory usage target - under 500MB",
       "description": "Ensure browser memory usage stays under 500MB for single tab",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
       "extraction_method": "llm",
@@ -847,15 +847,15 @@
         "Memory leaks prevented"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:55:00.000000Z",
-      "completion_method": "validation_tests",
-      "reconciliation_notes": "Validation tests created in tests/validation/performance.rs - validates 500MB memory target, cache size within budget, connection pool limits, and memory-efficient message types"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-033",
       "name": "Top 10 websites validation",
       "description": "Validate browser successfully loads top 10 websites",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
       "extraction_method": "llm",
@@ -871,15 +871,15 @@
         "No crashes during load"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:55:00.000000Z",
-      "completion_method": "validation_tests",
-      "reconciliation_notes": "Validation tests created in tests/validation/navigation.rs - validates URL parsing, protocol detection, and URL validation for top 10 websites (Google, YouTube, Facebook, Amazon, Wikipedia, Twitter, Instagram, LinkedIn, Reddit, Netflix)"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-034",
       "name": "Stability validation - 1 hour session",
       "description": "Validate browser runs without crashes during 1-hour usage session",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
       "extraction_method": "llm",
@@ -895,15 +895,15 @@
         "Multiple page navigations"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:55:00.000000Z",
-      "completion_method": "validation_tests",
-      "reconciliation_notes": "Validation tests created in tests/validation/stability.rs - validates component creation stability (10 iterations), message bus stability (20 cycles), concurrent operation stability, graceful shutdown, and includes ignored 1-hour extended stability test"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-035",
       "name": "Build system - build.rs",
       "description": "Implement build.rs for Windows resource compilation and EasyList download",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 1",
       "priority": "medium",
       "extraction_method": "llm",
@@ -919,15 +919,15 @@
         "Build succeeds on all platforms"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: build.rs"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-036",
       "name": "CI/CD pipeline",
       "description": "Implement GitHub Actions workflow for unit tests, WPT tests, and performance benchmarks",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "low",
       "extraction_method": "llm",
@@ -944,15 +944,15 @@
         "Regression detection"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: .github/workflows/"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-037",
       "name": "Unit test suite",
       "description": "Implement comprehensive unit tests for message bus, ad blocker, HTTP client",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "high",
       "extraction_method": "llm",
@@ -969,15 +969,15 @@
         "100% unit test pass rate"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: Each component's tests"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-038",
       "name": "Integration test suite",
       "description": "Implement integration tests for browser startup and navigation flow",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "high",
       "extraction_method": "llm",
@@ -995,15 +995,15 @@
         "100% integration test pass rate"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: integration_tests/tests/"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-039",
       "name": "Browser metrics collection",
       "description": "Implement BrowserMetrics struct for tracking page load time, memory usage, blocked requests",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "low",
       "extraction_method": "llm",
@@ -1021,15 +1021,15 @@
         "Track network requests"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:45:00.000000Z",
-      "completion_method": "reconciliation",
-      "reconciliation_notes": "Detected as already implemented via /orch-reconcile-queue. Location: components/network_stack/src/types.rs (ResourceTiming)"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-040",
       "name": "Security - HTTPS enforcement",
       "description": "Implement HTTPS enforcement with warnings for non-HTTPS content",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
       "extraction_method": "llm",
@@ -1045,15 +1045,15 @@
         "Visual indicator for secure/insecure"
       ],
       "started_at": null,
-      "completed_at": "2025-11-23T23:50:00.000000Z",
-      "completion_method": "resume_verification",
-      "reconciliation_notes": "Verified via /orchestrate --resume. Location: components/browser_shell/src/ui_components.rs - SecurityState enum with Secure/Insecure variants and lock/unlock visual indicators"
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     },
     {
       "id": "FEAT-041",
       "name": "Security - CSP compliance",
       "description": "Implement Content Security Policy header handling and enforcement",
-      "status": "completed",
+      "status": "incomplete",
       "phase": "Week 3",
       "priority": "low",
       "extraction_method": "llm",
@@ -1069,21 +1069,13 @@
         "Enforce style-src"
       ],
       "started_at": null,
-      "completed_at": "2025-11-24T00:10:00.000000Z",
-      "completion_method": "implementation",
-      "reconciliation_notes": "Implemented CSP module in components/network_stack/src/csp.rs - includes CSP header parsing (Content-Security-Policy, Content-Security-Policy-Report-Only), directive validation (script-src, style-src, default-src, img-src, etc.), source expression parsing ('self', 'unsafe-inline', 'unsafe-eval', URLs, wildcards), CspManager for per-origin policy tracking, and CspInterceptor for automatic CSP extraction from responses. 35 unit tests covering all functionality."
+      "completed_at": null,
+      "completion_method": null,
+      "reconciliation_notes": "Reset via /orch-reconcile-queue --reset for re-verification"
     }
   ],
-  "completed_order": [
-    "FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004", "FEAT-005", "FEAT-006",
-    "FEAT-007", "FEAT-008", "FEAT-009", "FEAT-010", "FEAT-011", "FEAT-012",
-    "FEAT-013", "FEAT-014", "FEAT-015", "FEAT-016", "FEAT-017", "FEAT-018", "FEAT-019",
-    "FEAT-020", "FEAT-021", "FEAT-022", "FEAT-023", "FEAT-024", "FEAT-025",
-    "FEAT-026", "FEAT-027", "FEAT-028", "FEAT-029", "FEAT-030", "FEAT-031",
-    "FEAT-032", "FEAT-033", "FEAT-034", "FEAT-035", "FEAT-036",
-    "FEAT-037", "FEAT-038", "FEAT-039", "FEAT-040", "FEAT-041"
-  ],
-  "last_updated": "2025-11-24T00:10:00.000000Z",
+  "completed_order": [],
+  "last_updated": "2025-11-24T00:15:00.000000Z",
   "initialized": true,
   "spec_file": "specifications/frankenstein-browser-specification.md",
   "spec_files": [
@@ -1091,16 +1083,11 @@
   ],
   "total_features": 41,
   "detected_language": "Rust",
-  "reconciliation": {
-    "timestamp": "2025-11-23T23:45:00.000000Z",
-    "tasks_marked_complete": 33,
-    "tasks_kept_pending": 8,
-    "method": "/orch-reconcile-queue"
-  },
-  "resume_verification": {
-    "timestamp": "2025-11-23T23:50:00.000000Z",
-    "tasks_verified_complete": 2,
-    "verified_tasks": ["FEAT-013", "FEAT-040"],
-    "method": "/orchestrate --resume"
+  "reset": {
+    "timestamp": "2025-11-24T00:15:00.000000Z",
+    "tasks_reset": 41,
+    "previous_completed": 41,
+    "method": "/orch-reconcile-queue --reset",
+    "reason": "Complete re-verification requested"
   }
 }
