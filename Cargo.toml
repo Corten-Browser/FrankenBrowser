@@ -84,6 +84,15 @@ walkdir = { workspace = true }
 
 [dev-dependencies]
 tempfile = "3.8"
+# Workspace components for testing
+shared-types = { path = "components/shared_types" }
+message-bus = { path = "components/message_bus" }
+config-manager = { path = "components/config_manager" }
+network-stack = { path = "components/network_stack" }
+adblock-engine = { path = "components/adblock_engine" }
+browser-core = { path = "components/browser_core" }
+browser-shell = { path = "components/browser_shell" }
+url = { workspace = true }
 
 [build-dependencies]
 reqwest = { version = "0.11", features = ["blocking"] }

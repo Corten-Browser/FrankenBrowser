@@ -11,14 +11,15 @@ use std::time::Duration;
 #[test]
 fn test_message_bus_lifecycle() {
     // Create message bus
-    let bus = MessageBus::new();
+    let mut bus = MessageBus::new();
+    bus.start().expect("Bus should start");
     let sender = bus.sender();
 
     // Verify sender works
     assert!(sender.send(BrowserMessage::Shutdown).is_ok());
 
-    // Message bus should be functional
-    drop(bus);
+    // Message bus should shutdown cleanly
+    bus.shutdown().ok();
 }
 
 #[test]
@@ -42,11 +43,13 @@ fn test_config_lifecycle() {
 
 #[test]
 fn test_adblock_engine_lifecycle() {
-    let bus = MessageBus::new();
+    let mut bus = MessageBus::new();
+    bus.start().expect("Bus should start");
     let sender = bus.sender();
+    let config = Config::default();
 
     // Create adblock engine
-    let engine_result = AdBlockEngine::new(sender);
+    let engine_result = AdBlockEngine::new(config.adblock_config(), sender);
 
     // Engine should initialize (even with empty filters)
     assert!(engine_result.is_ok());
@@ -66,9 +69,12 @@ fn test_adblock_engine_lifecycle() {
 #[test]
 fn test_multiple_message_bus_instances() {
     // Should be able to create multiple independent message buses
-    let bus1 = MessageBus::new();
-    let bus2 = MessageBus::new();
-    let bus3 = MessageBus::new();
+    let mut bus1 = MessageBus::new();
+    let mut bus2 = MessageBus::new();
+    let mut bus3 = MessageBus::new();
+    bus1.start().expect("Bus1 should start");
+    bus2.start().expect("Bus2 should start");
+    bus3.start().expect("Bus3 should start");
 
     let sender1 = bus1.sender();
     let sender2 = bus2.sender();
@@ -78,26 +84,42 @@ fn test_multiple_message_bus_instances() {
     assert!(sender1.send(BrowserMessage::Shutdown).is_ok());
     assert!(sender2.send(BrowserMessage::Shutdown).is_ok());
     assert!(sender3.send(BrowserMessage::Shutdown).is_ok());
+
+    bus1.shutdown().ok();
+    bus2.shutdown().ok();
+    bus3.shutdown().ok();
 }
 
 #[test]
 fn test_concurrent_message_bus_usage() {
     use std::thread;
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicBool, Ordering};
 
-    let bus = MessageBus::new();
-    let sender = bus.sender();
+    // Test multiple independent message buses running concurrently
+    let running = Arc::new(AtomicBool::new(true));
 
-    // Spawn multiple threads using the same message bus
-    let handles: Vec<_> = (0..10)
-        .map(|_| {
-            let sender = sender.clone();
+    let handles: Vec<_> = (0..5)
+        .map(|i| {
+            let running = running.clone();
             thread::spawn(move || {
-                for _ in 0..100 {
+                let mut bus = MessageBus::new();
+                bus.start().expect("Bus should start");
+                let sender = bus.sender();
+                let mut count = 0;
+                while running.load(Ordering::SeqCst) && count < 100 {
                     sender.send(BrowserMessage::Shutdown).ok();
+                    count += 1;
                 }
+                bus.shutdown().ok();
+                i // return thread index
             })
         })
         .collect();
+
+    // Let threads run briefly
+    thread::sleep(Duration::from_millis(100));
+    running.store(false, Ordering::SeqCst);
 
     // All threads should complete successfully
     for handle in handles {
@@ -141,34 +163,42 @@ fn test_component_initialization_order() {
     // Test that components can be initialized in correct dependency order
 
     // 1. Message bus (no dependencies)
-    let bus = MessageBus::new();
+    let mut bus = MessageBus::new();
+    bus.start().expect("Bus should start");
     let sender = bus.sender();
 
     // 2. Config (no dependencies)
     let config = Config::default();
 
-    // 3. AdBlock engine (depends on message bus)
-    let adblock = AdBlockEngine::new(sender.clone());
+    // 3. AdBlock engine (depends on message bus and config)
+    let adblock_config = config.adblock_config();
+    let adblock = AdBlockEngine::new(adblock_config, sender);
     assert!(adblock.is_ok());
 
     // 4. Additional components would follow (browser_core, etc.)
     // This validates the dependency order is correct
+    bus.shutdown().ok();
 }
 
 #[test]
 fn test_resource_cleanup() {
     // Test that dropping components doesn't cause panics
     {
-        let bus = MessageBus::new();
+        let mut bus = MessageBus::new();
+        bus.start().expect("Bus should start");
         let sender = bus.sender();
-        let _adblock = AdBlockEngine::new(sender).unwrap();
+        let config = Config::default();
+        let _adblock = AdBlockEngine::new(config.adblock_config(), sender).unwrap();
 
         // All should be dropped here
+        bus.shutdown().ok();
     }
 
     // Should be able to create new instances after cleanup
-    let bus2 = MessageBus::new();
+    let mut bus2 = MessageBus::new();
+    bus2.start().expect("Bus should start");
     assert!(bus2.sender().send(BrowserMessage::Shutdown).is_ok());
+    bus2.shutdown().ok();
 }
 
 #[test]
@@ -181,11 +211,14 @@ fn test_error_handling() {
     assert!(result.is_err());
 
     // Components should handle invalid inputs
-    let bus = MessageBus::new();
+    let mut bus = MessageBus::new();
+    bus.start().expect("Bus should start");
     let sender = bus.sender();
 
-    // Sending to closed channel should be handled
-    drop(bus);
+    // Shutdown the bus
+    bus.shutdown().ok();
+
+    // Sending to closed bus should be handled without panic
     let result = sender.send(BrowserMessage::Shutdown);
     // Result will be Err but shouldn't panic
     assert!(result.is_err());

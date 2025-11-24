@@ -74,12 +74,16 @@
 //! ```
 
 pub mod cache;
+pub mod csp;
 pub mod errors;
 pub mod request_handler;
 pub mod types;
 
 // Re-export main types for convenience
 pub use cache::{CacheControl, CacheEntry, HttpCache};
+pub use csp::{
+    ContentSecurityPolicy, CspDirective, CspInterceptor, CspManager, CspSource, ResourceType,
+};
 pub use errors::{Error, Result};
 pub use request_handler::{
     AdBlockInterceptor, HeaderInjectorInterceptor, HttpMethod, RedirectInterceptor, Request,

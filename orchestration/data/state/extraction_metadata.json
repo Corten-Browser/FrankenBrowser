@@ -1,18 +1,30 @@
 {
-  "last_extraction": "2025-11-23T23:12:23.835107",
-  "extraction_method": "pending-llm",
+  "last_extraction": "2025-11-23T23:30:00.000000",
+  "extraction_method": "hybrid",
   "spec_files": [
     {
       "path": "specifications/frankenstein-browser-specification.md",
-      "features_extracted": 0,
-      "extraction_method": "none",
-      "last_processed": "2025-11-23T23:12:23.835169"
+      "features_extracted": 41,
+      "extraction_method": "llm",
+      "last_processed": "2025-11-23T23:30:00.000000"
     }
   ],
-  "total_features": 0,
+  "total_features": 41,
   "automated_features": 0,
-  "llm_features": 0,
-  "llm_extraction_complete": false,
-  "llm_extraction_timestamp": null,
-  "automated_extraction_success": false
+  "llm_features": 41,
+  "llm_extraction_complete": true,
+  "llm_extraction_timestamp": "2025-11-23T23:30:00.000000",
+  "automated_extraction_success": false,
+  "detected_language": "Rust",
+  "language_confidence": "high",
+  "template_matching_results": {
+    "features_with_templates": 8,
+    "features_without_templates": 33,
+    "matched_templates": [
+      "shell-window-management",
+      "networking-http-client",
+      "data-database-abstraction",
+      "quality-logging-observability"
+    ]
+  }
 }
