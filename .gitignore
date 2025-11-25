@@ -4,6 +4,7 @@
 
 # Runtime state files
 orchestration-state.json
+orchestration-resume-context.json
 orchestration/split-history.json
 orchestration/migration-state.json
 
@@ -24,6 +25,9 @@ orchestration/*.tmp
 orchestration/*.temp
 
 # Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
 orchestration/__pycache__/
 orchestration/**/__pycache__/
 orchestration/**/*.pyc
