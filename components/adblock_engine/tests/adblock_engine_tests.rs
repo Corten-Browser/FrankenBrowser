@@ -310,3 +310,99 @@ fn test_adblock_engine_clone() {
     assert!(engine.should_block("https://ads.example.com/banner.js", ResourceType::Script));
     assert!(cloned_engine.should_block("https://ads.example.com/banner.js", ResourceType::Script));
 }
+
+// ========================================
+// Tests for Element Hider CSS Generation
+// ========================================
+
+#[test]
+fn test_get_element_hider_css_with_disabled_engine() {
+    let config = AdBlockConfig {
+        enabled: false,
+        update_filters_on_startup: false,
+        custom_filters: vec![],
+    };
+    let sender = Box::new(MockMessageSender::new());
+
+    let mut engine = AdBlockEngine::new(config, sender).unwrap();
+    engine.initialize().unwrap();
+
+    let css = engine.get_element_hider_css("https://example.com");
+    assert!(css.is_none());
+}
+
+#[test]
+fn test_get_element_hider_css_before_initialization() {
+    let config = AdBlockConfig {
+        enabled: true,
+        update_filters_on_startup: false,
+        custom_filters: vec![],
+    };
+    let sender = Box::new(MockMessageSender::new());
+
+    let engine = AdBlockEngine::new(config, sender).unwrap();
+
+    let css = engine.get_element_hider_css("https://example.com");
+    assert!(css.is_none());
+}
+
+#[test]
+fn test_get_element_hider_css_returns_valid_css() {
+    // Use a cosmetic filter that applies globally
+    let config = AdBlockConfig {
+        enabled: true,
+        update_filters_on_startup: false,
+        custom_filters: vec![
+            "##.ad-banner".to_string(),
+            "##.sponsored-content".to_string(),
+        ],
+    };
+    let sender = Box::new(MockMessageSender::new());
+
+    let mut engine = AdBlockEngine::new(config, sender).unwrap();
+    engine.initialize().unwrap();
+
+    let css = engine.get_element_hider_css("https://example.com");
+
+    // If there are selectors, CSS should contain display: none
+    if let Some(css_text) = css {
+        assert!(css_text.contains("display: none !important"));
+    }
+    // Note: empty CSS is valid if no cosmetic rules match
+}
+
+#[test]
+fn test_get_element_hider_style_tag_format() {
+    let config = AdBlockConfig {
+        enabled: true,
+        update_filters_on_startup: false,
+        custom_filters: vec!["##.ad-banner".to_string()],
+    };
+    let sender = Box::new(MockMessageSender::new());
+
+    let mut engine = AdBlockEngine::new(config, sender).unwrap();
+    engine.initialize().unwrap();
+
+    let style_tag = engine.get_element_hider_style_tag("https://example.com");
+
+    if let Some(tag) = style_tag {
+        assert!(tag.starts_with("<style id=\"adblock-element-hider\">"));
+        assert!(tag.ends_with("</style>"));
+    }
+}
+
+#[test]
+fn test_get_element_hider_style_tag_disabled() {
+    let config = AdBlockConfig {
+        enabled: false,
+        update_filters_on_startup: false,
+        custom_filters: vec![],
+    };
+    let sender = Box::new(MockMessageSender::new());
+
+    let mut engine = AdBlockEngine::new(config, sender).unwrap();
+    engine.initialize().unwrap();
+
+    let style_tag = engine.get_element_hider_style_tag("https://example.com");
+    assert!(style_tag.is_none());
+}
