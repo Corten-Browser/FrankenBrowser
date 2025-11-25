@@ -62,17 +62,21 @@ fn test_navigation_pipeline_components_integration() {
 }
 
 #[test]
+#[ignore] // Requires network and initialized stack
 fn test_network_stack_http_request() {
     // Test network stack can make HTTP requests
     let mut bus = MessageBus::new();
     bus.start().expect("Failed to start bus");
 
     let config = Config::default();
-    let network = NetworkStack::new(config.network_config(), bus.sender())
+    let mut network = NetworkStack::new(config.network_config(), bus.sender())
         .expect("Failed to create network stack");
 
+    // Initialize the network stack before use
+    network.initialize().expect("Failed to initialize network stack");
+
     // Create runtime for async test
-    let runtime = tokio::runtime::Runtime::new().expect("Failed to create runtime");
+    let runtime = ::tokio::runtime::Runtime::new().expect("Failed to create runtime");
 
     runtime.block_on(async {
         // Test fetching a simple URL
@@ -82,11 +86,10 @@ fn test_network_stack_http_request() {
         // Note: This may fail if there's no internet connection
         // In production, we'd use mocking for deterministic tests
         match result {
-            Ok(response) => {
+            Ok(data) => {
                 println!("✓ Successfully fetched example.com");
-                println!("  Status: {}", response.status);
-                println!("  Size: {} bytes", response.body.len());
-                assert!(response.body.len() > 0, "Response body should not be empty");
+                println!("  Size: {} bytes", data.len());
+                assert!(!data.is_empty(), "Response body should not be empty");
             }
             Err(e) => {
                 println!("⚠ Network request failed (may be offline): {}", e);
@@ -173,8 +176,10 @@ fn test_browser_core_history_tracking() {
     let history = engine.get_history();
     assert_eq!(history.len(), 3, "Should have 3 history entries");
 
+    // Compare normalized URLs (Url type may add trailing slash)
     for (i, url_str) in urls.iter().enumerate() {
-        assert_eq!(history[i].url, *url_str);
+        let expected_url = Url::parse(url_str).expect("Invalid URL").to_string();
+        assert_eq!(history[i].url, expected_url);
     }
 
     // Cleanup
