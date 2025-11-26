@@ -1,19 +1,26 @@
 {
-  "last_extraction": "2025-11-23T23:30:00.000000",
+  "last_extraction": "2025-11-26T12:00:00.000000Z",
   "extraction_method": "hybrid",
   "spec_files": [
     {
       "path": "specifications/frankenstein-browser-specification.md",
       "features_extracted": 41,
       "extraction_method": "llm",
-      "last_processed": "2025-11-23T23:30:00.000000"
+      "last_processed": "2025-11-26T12:00:00.000000Z"
+    },
+    {
+      "path": "specifications/llm-extraction-specification.md",
+      "features_extracted": 0,
+      "extraction_method": "llm",
+      "last_processed": "2025-11-26T12:00:00.000000Z",
+      "notes": "Meta-specification for extraction system, not project features"
     }
   ],
   "total_features": 41,
   "automated_features": 0,
   "llm_features": 41,
   "llm_extraction_complete": true,
-  "llm_extraction_timestamp": "2025-11-23T23:30:00.000000",
+  "llm_extraction_timestamp": "2025-11-26T12:00:00.000000Z",
   "automated_extraction_success": false,
   "detected_language": "Rust",
   "language_confidence": "high",
@@ -26,5 +33,103 @@
       "data-database-abstraction",
       "quality-logging-observability"
     ]
+  },
+  "extraction_version": "1.16.0",
+  "v1_16_0_enrichments": {
+    "source_traceability_added": true,
+    "requirement_types_assigned": true,
+    "anti_bypass_clauses_generated": true,
+    "external_references_resolved": true,
+    "acceptance_criteria_enhanced": true
+  },
+  "requirement_type_counts": {
+    "feature": 27,
+    "compliance": 6,
+    "performance": 1,
+    "constraint": 1,
+    "quality": 5,
+    "integration": 1
+  },
+  "compliance_requirements": {
+    "total": 6,
+    "with_anti_bypass_clauses": 5,
+    "with_external_references": 4,
+    "external_suites_referenced": [
+      {
+        "name": "Web Platform Tests",
+        "acronym": "WPT",
+        "url": "https://github.com/web-platform-tests/wpt",
+        "type": "conformance_suite"
+      },
+      {
+        "name": "ACID1 Test",
+        "url": "https://www.acidtests.org/",
+        "type": "conformance_test"
+      },
+      {
+        "name": "EasyList",
+        "url": "https://easylist.to/easylist/easylist.txt",
+        "type": "filter_list"
+      }
+    ]
+  },
+  "acronyms_resolved": [
+    {
+      "acronym": "WPT",
+      "full_name": "Web Platform Tests",
+      "url": "https://github.com/web-platform-tests/wpt"
+    },
+    {
+      "acronym": "ACID",
+      "full_name": "Acid Tests (CSS Conformance)",
+      "url": "https://www.acidtests.org/"
+    },
+    {
+      "acronym": "CSP",
+      "full_name": "Content Security Policy",
+      "url": "https://www.w3.org/TR/CSP/"
+    },
+    {
+      "acronym": "HTTP",
+      "full_name": "Hypertext Transfer Protocol",
+      "url": "https://httpwg.org/"
+    },
+    {
+      "acronym": "HTTPS",
+      "full_name": "HTTP Secure",
+      "url": "https://tools.ietf.org/html/rfc2818"
+    },
+    {
+      "acronym": "IPC",
+      "full_name": "Inter-Process Communication"
+    },
+    {
+      "acronym": "DOM",
+      "full_name": "Document Object Model",
+      "url": "https://dom.spec.whatwg.org/"
+    },
+    {
+      "acronym": "CSS",
+      "full_name": "Cascading Style Sheets",
+      "url": "https://www.w3.org/Style/CSS/"
+    }
+  ],
+  "validation_results": {
+    "completeness_check": true,
+    "disambiguation_check": true,
+    "anti_bypass_check": true,
+    "all_features_have_source": true,
+    "all_features_have_type": true,
+    "compliance_requirements_verified": true
+  },
+  "human_review_queue": [],
+  "statistics": {
+    "total_requirements": 41,
+    "completed": 32,
+    "incomplete": 9,
+    "blocked_by_gui": 9,
+    "enriched_in_this_extraction": 41,
+    "new_anti_bypass_clauses": 14,
+    "source_lines_traced": 41
   }
 }

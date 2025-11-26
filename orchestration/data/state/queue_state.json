@@ -4,6 +4,7 @@
       "id": "FEAT-001",
       "name": "Project setup and dependency configuration",
       "description": "Initialize Rust project with Cargo.toml containing all required dependencies (wry, tao, reqwest, adblock, tokio, egui, serde, rusqlite, etc.)",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 1",
       "priority": "high",
@@ -11,8 +12,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Implementation Milestones - Week 1",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 559,
+        "verbatim": "Day 1-2: Project setup and dependency configuration"
+      },
       "dependencies": [],
       "started_at": null,
       "completed_at": "2025-11-25T07:16:16.129929Z",
@@ -23,6 +27,7 @@
       "id": "FEAT-002",
       "name": "Message bus implementation",
       "description": "Implement message bus system with BrowserMessage enum supporting navigation, network, adblock, and tab messages. Use crossbeam-channel for IPC.",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 1",
       "priority": "high",
@@ -30,8 +35,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/message_bus/messages.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 560,
+        "verbatim": "Day 3-4: Message bus implementation and testing"
+      },
       "dependencies": [
         "FEAT-001"
       ],
@@ -50,6 +58,7 @@
       "id": "FEAT-003",
       "name": "Browser shell with WRY integration",
       "description": "Create browser shell using WRY for WebView integration. Window opens, displays content, handles IPC messages.",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 1",
       "priority": "high",
@@ -59,8 +68,11 @@
       "template_name": "Window Management and Chrome UI",
       "difficulty": "hard",
       "estimated_loc": "7000-12000",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/shell/window.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 561,
+        "verbatim": "Day 5-7: Basic WRY window with tab management"
+      },
       "dependencies": [
         "FEAT-001",
         "FEAT-002"
@@ -96,6 +108,7 @@
       "id": "FEAT-004",
       "name": "Tab manager implementation",
       "description": "Implement tab management system supporting create, close, and switch operations. Track active tabs per window.",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 1",
       "priority": "high",
@@ -105,8 +118,11 @@
       "template_name": "Window Management and Chrome UI",
       "difficulty": "medium",
       "estimated_loc": "2000-4000",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/shell/tab_manager.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 100,
+        "verbatim": "tab_manager.rs"
+      },
       "dependencies": [
         "FEAT-003"
       ],
@@ -126,6 +142,7 @@
       "id": "FEAT-005",
       "name": "UI components - URL bar and controls",
       "description": "Implement browser UI components: URL bar with input, navigation controls (back, forward, reload, stop)",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 1",
       "priority": "medium",
@@ -135,8 +152,11 @@
       "template_name": "Window Management and Chrome UI",
       "difficulty": "medium",
       "estimated_loc": "1500-3000",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/shell/ui_components.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 101,
+        "verbatim": "ui_components.rs"
+      },
       "dependencies": [
         "FEAT-003"
       ],
@@ -172,6 +192,7 @@
       "id": "FEAT-006",
       "name": "Menu system",
       "description": "Implement browser menu bar with File, Edit, View menus and standard keyboard shortcuts",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 1",
       "priority": "low",
@@ -179,8 +200,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/shell/menu.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 102,
+        "verbatim": "menu.rs"
+      },
       "dependencies": [
         "FEAT-003"
       ],
@@ -199,6 +223,7 @@
       "id": "FEAT-007",
       "name": "HTTP client implementation",
       "description": "Implement HTTP client using reqwest with cookie support, gzip/brotli compression, connection pooling, and 30-second timeout",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "high",
@@ -208,8 +233,11 @@
       "template_name": "HTTP Protocol Client",
       "difficulty": "medium",
       "estimated_loc": "5000-8000",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/network/http_client.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 566,
+        "verbatim": "Day 8-9: HTTP client with request/response handling"
+      },
       "dependencies": [
         "FEAT-002"
       ],
@@ -246,6 +274,7 @@
       "id": "FEAT-008",
       "name": "Request handler",
       "description": "Implement request handler that coordinates HTTP requests with message bus and ad blocker integration",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "high",
@@ -255,8 +284,11 @@
       "template_name": "HTTP Protocol Client",
       "difficulty": "medium",
       "estimated_loc": "2000-4000",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/network/request_handler.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 112,
+        "verbatim": "request_handler.rs"
+      },
       "dependencies": [
         "FEAT-007",
         "FEAT-002"
@@ -276,6 +308,7 @@
       "id": "FEAT-009",
       "name": "Network cache system",
       "description": "Implement HTTP response cache with configurable size (default 500MB)",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "medium",
@@ -283,8 +316,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/network/cache.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 113,
+        "verbatim": "cache.rs"
+      },
       "dependencies": [
         "FEAT-007"
       ],
@@ -303,6 +339,7 @@
       "id": "FEAT-010",
       "name": "Cookie management",
       "description": "Implement cookie storage with per-origin isolation using cookie_store crate",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "medium",
@@ -310,8 +347,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/network/cookies.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 114,
+        "verbatim": "cookies.rs"
+      },
       "dependencies": [
         "FEAT-007"
       ],
@@ -337,7 +377,8 @@
     {
       "id": "FEAT-011",
       "name": "Ad blocker filter engine",
-      "description": "Implement ad blocking using adblock crate with EasyList filter loading",
+      "description": "Implement ad blocking using adblock crate with EasyList filter loading. Must achieve >90% of EasyList rules applied.",
+      "type": "compliance",
       "status": "completed",
       "phase": "Week 2",
       "priority": "high",
@@ -345,8 +386,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/adblock/filter_engine.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 940,
+        "verbatim": "Ad Block Effectiveness: > 90% of EasyList rules applied"
+      },
       "dependencies": [
         "FEAT-002"
       ],
@@ -359,6 +403,35 @@
           "registry_url": "https://crates.io/crates/adblock"
         }
       ],
+      "external_reference": {
+        "name": "EasyList",
+        "url": "https://easylist.to/easylist/easylist.txt",
+        "type": "filter_list",
+        "description": "Primary ad blocking filter list"
+      },
+      "verification": {
+        "method": "internal_test",
+        "threshold": {
+          "metric": "filter_application_rate",
+          "value": 0.90,
+          "operator": ">="
+        },
+        "evidence_required": [
+          "Filter loading test results",
+          "Rule application statistics",
+          "Block rate on test pages"
+        ]
+      },
+      "not_satisfied_by": [
+        {
+          "description": "Custom filter list not based on EasyList",
+          "rationale": "Must use actual EasyList from easylist.to"
+        },
+        {
+          "description": "Partial EasyList implementation",
+          "rationale": "Must apply >90% of EasyList rules, not a subset"
+        }
+      ],
       "acceptance_criteria": [
         "Load EasyList filters",
         "Block matching URLs",
@@ -369,12 +442,14 @@
       "started_at": null,
       "completed_at": "2025-11-25T07:16:16.129929Z",
       "completion_method": "code_verified",
-      "reconciliation_notes": "Ad blocker: AdBlockEngine using adblock crate"
+      "reconciliation_notes": "Ad blocker: AdBlockEngine using adblock crate",
+      "enriched_by_llm": true
     },
     {
       "id": "FEAT-012",
       "name": "Ad block rule loader",
       "description": "Load and parse filter rules from EasyList file in resources/filters/",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "medium",
@@ -382,8 +457,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/adblock/rule_loader.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 118,
+        "verbatim": "rule_loader.rs"
+      },
       "dependencies": [
         "FEAT-011"
       ],
@@ -401,6 +479,7 @@
       "id": "FEAT-013",
       "name": "Element hider for cosmetic filtering",
       "description": "Implement cosmetic filtering to hide ad elements in DOM",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "low",
@@ -408,8 +487,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/adblock/element_hider.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 119,
+        "verbatim": "element_hider.rs"
+      },
       "dependencies": [
         "FEAT-011",
         "FEAT-014"
@@ -428,6 +510,7 @@
       "id": "FEAT-014",
       "name": "WebView wrapper",
       "description": "Create WebView abstraction wrapper over platform WebViews (webkit2gtk, webview2, cocoa)",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "high",
@@ -435,8 +518,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/webview/webview_wrapper.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 122,
+        "verbatim": "webview_wrapper.rs"
+      },
       "dependencies": [
         "FEAT-003"
       ],
@@ -455,6 +541,7 @@
       "id": "FEAT-015",
       "name": "JavaScript bridge for IPC",
       "description": "Implement JavaScript bridge for communication between WebView and Rust backend",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "medium",
@@ -462,8 +549,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/webview/javascript_bridge.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 123,
+        "verbatim": "javascript_bridge.rs"
+      },
       "dependencies": [
         "FEAT-014",
         "FEAT-002"
@@ -483,6 +573,7 @@
       "id": "FEAT-016",
       "name": "Linux platform support",
       "description": "Implement Linux-specific WebView using webkit2gtk",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "high",
@@ -490,8 +581,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/webview/platform/linux.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 126,
+        "verbatim": "linux.rs"
+      },
       "dependencies": [
         "FEAT-014"
       ],
@@ -525,6 +619,7 @@
       "id": "FEAT-017",
       "name": "Windows platform support",
       "description": "Implement Windows-specific WebView using WebView2",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "medium",
@@ -532,8 +627,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/webview/platform/windows.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 127,
+        "verbatim": "windows.rs"
+      },
       "dependencies": [
         "FEAT-014"
       ],
@@ -567,6 +665,7 @@
       "id": "FEAT-018",
       "name": "macOS platform support",
       "description": "Implement macOS-specific WebView using Cocoa/WKWebView",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 2",
       "priority": "medium",
@@ -574,8 +673,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/webview/platform/macos.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 128,
+        "verbatim": "macos.rs"
+      },
       "dependencies": [
         "FEAT-014"
       ],
@@ -609,6 +711,7 @@
       "id": "FEAT-019",
       "name": "Navigation system",
       "description": "Implement navigation with back, forward, reload, and stop functionality",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 3",
       "priority": "high",
@@ -616,8 +719,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/core/navigation.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 106,
+        "verbatim": "navigation.rs"
+      },
       "dependencies": [
         "FEAT-014",
         "FEAT-007"
@@ -638,6 +744,7 @@
       "id": "FEAT-020",
       "name": "History management",
       "description": "Implement browser history storage using rusqlite SQLite database",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 3",
       "priority": "medium",
@@ -647,8 +754,11 @@
       "template_name": "Database ORM and Query Abstraction",
       "difficulty": "medium",
       "estimated_loc": "1500-3000",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/core/history.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 107,
+        "verbatim": "history.rs"
+      },
       "dependencies": [
         "FEAT-001"
       ],
@@ -676,6 +786,7 @@
       "id": "FEAT-021",
       "name": "Bookmarks management",
       "description": "Implement bookmarks storage and management using SQLite",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 3",
       "priority": "medium",
@@ -685,8 +796,11 @@
       "template_name": "Database ORM and Query Abstraction",
       "difficulty": "medium",
       "estimated_loc": "1500-3000",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/core/bookmarks.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 108,
+        "verbatim": "bookmarks.rs"
+      },
       "dependencies": [
         "FEAT-020"
       ],
@@ -705,6 +819,7 @@
       "id": "FEAT-022",
       "name": "Configuration system",
       "description": "Implement configuration loading from TOML files with default settings",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 3",
       "priority": "medium",
@@ -712,8 +827,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/config/",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 134,
+        "verbatim": "src/config/"
+      },
       "dependencies": [
         "FEAT-001"
       ],
@@ -748,6 +866,7 @@
       "id": "FEAT-023",
       "name": "Logging system",
       "description": "Implement logging using tracing crate with subscriber configuration",
+      "type": "quality",
       "status": "completed",
       "phase": "Week 1",
       "priority": "medium",
@@ -757,8 +876,11 @@
       "template_name": "Logging and Observability",
       "difficulty": "easy",
       "estimated_loc": "500-1000",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/utils/logging.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 139,
+        "verbatim": "logging.rs"
+      },
       "dependencies": [
         "FEAT-001"
       ],
@@ -792,6 +914,7 @@
       "id": "FEAT-024",
       "name": "Error handling utilities",
       "description": "Implement error handling using anyhow and thiserror crates",
+      "type": "quality",
       "status": "completed",
       "phase": "Week 1",
       "priority": "medium",
@@ -799,8 +922,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/utils/errors.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 140,
+        "verbatim": "errors.rs"
+      },
       "dependencies": [
         "FEAT-001"
       ],
@@ -834,6 +960,7 @@
       "id": "FEAT-025",
       "name": "Browser engine core",
       "description": "Implement BrowserApp struct coordinating all components (shell, message_bus, network, adblock)",
+      "type": "integration",
       "status": "completed",
       "phase": "Week 1",
       "priority": "high",
@@ -841,8 +968,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "src/lib.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 174,
+        "verbatim": "src/lib.rs"
+      },
       "dependencies": [
         "FEAT-002",
         "FEAT-003",
@@ -862,7 +992,8 @@
     {
       "id": "FEAT-026",
       "name": "WPT test harness integration",
-      "description": "Implement Web Platform Tests harness for browser compatibility testing",
+      "description": "Implement Web Platform Tests harness for browser compatibility testing. Must achieve 40% WPT overall pass rate.",
+      "type": "compliance",
       "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
@@ -870,27 +1001,83 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Public Test Suite Integration",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 14,
+        "verbatim": "Test Coverage Target: WPT 40% overall using existing components"
+      },
       "dependencies": [
         "FEAT-025"
       ],
+      "external_reference": {
+        "name": "Web Platform Tests",
+        "acronym": "WPT",
+        "url": "https://github.com/web-platform-tests/wpt",
+        "type": "conformance_suite",
+        "authoritative_source": "https://web-platform-tests.org/",
+        "test_paths": [
+          "html/browsers/browsing-the-web/navigating-across-documents",
+          "html/browsers/history",
+          "fetch/api/basic"
+        ]
+      },
+      "verification": {
+        "method": "external_suite",
+        "suite_name": "Web Platform Tests",
+        "suite_url": "https://github.com/web-platform-tests/wpt",
+        "threshold": {
+          "metric": "pass_rate",
+          "value": 0.40,
+          "operator": ">="
+        },
+        "evidence_required": [
+          "WPT harness execution log",
+          "Results JSON from wpt run",
+          "WPT repository commit hash used",
+          "Screenshot of test results summary"
+        ]
+      },
+      "not_satisfied_by": [
+        {
+          "description": "Internal tests mimicking WPT naming conventions",
+          "rationale": "Must run actual Web Platform Tests from https://github.com/web-platform-tests/wpt, not internal approximations"
+        },
+        {
+          "description": "Subset of WPT tests cherry-picked for passing",
+          "rationale": "Must run all tests in specified paths, not a cherry-picked subset"
+        },
+        {
+          "description": "Mocked or stubbed WPT harness",
+          "rationale": "Must execute tests against real browser/engine output using official wpt harness"
+        },
+        {
+          "description": "Self-reported pass rates without execution evidence",
+          "rationale": "Must provide WPT harness execution logs and results JSON as evidence"
+        },
+        {
+          "description": "Tests run against different/older WPT version",
+          "rationale": "Must document WPT commit hash and use reasonably current version"
+        }
+      ],
       "acceptance_criteria": [
-        "WPT harness runs tests",
-        "Navigate to test pages",
+        "WPT repository cloned and configured",
+        "WPT harness configured for Frankenstein Browser",
+        "Navigate to test pages via harness",
         "Execute test scripts",
-        "Report test results",
-        "40% WPT pass rate for Phase 1"
+        "Report test results in WPT format",
+        "40% WPT pass rate achieved and documented"
       ],
       "started_at": null,
       "completed_at": null,
       "completion_method": null,
-      "reconciliation_notes": "BLOCKED: WPT harness needs running browser with webdriver - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available)"
+      "reconciliation_notes": "BLOCKED: WPT harness needs running browser with webdriver - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available)",
+      "enriched_by_llm": true
     },
     {
       "id": "FEAT-027",
       "name": "ACID1 test compliance",
-      "description": "Ensure browser passes ACID1 test (basic CSS1 box model)",
+      "description": "Ensure browser passes ACID1 test (basic CSS1 box model). ACID1 is REQUIRED to pass.",
+      "type": "compliance",
       "status": "incomplete",
       "phase": "Week 3",
       "priority": "high",
@@ -898,25 +1085,67 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "ACID Test Compliance",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 935,
+        "verbatim": "ACID1: PASS (required)"
+      },
       "dependencies": [
         "FEAT-014"
       ],
+      "external_reference": {
+        "name": "ACID1 Test",
+        "url": "https://www.acidtests.org/",
+        "type": "conformance_test",
+        "authoritative_source": "https://www.w3.org/Style/CSS/Test/CSS1/current/test5526c.htm",
+        "description": "Tests basic CSS1 box model rendering"
+      },
+      "verification": {
+        "method": "visual_comparison",
+        "suite_name": "ACID1",
+        "suite_url": "https://www.acidtests.org/",
+        "threshold": {
+          "metric": "visual_similarity",
+          "value": 0.99,
+          "operator": ">="
+        },
+        "evidence_required": [
+          "Screenshot of ACID1 test page rendered by browser",
+          "Reference image comparison",
+          "Pixel difference analysis report"
+        ]
+      },
+      "not_satisfied_by": [
+        {
+          "description": "Internal CSS tests claiming ACID1 compliance",
+          "rationale": "Must render actual ACID1 test page from acidtests.org"
+        },
+        {
+          "description": "Manual inspection without automated comparison",
+          "rationale": "Must provide quantitative visual similarity metric >99%"
+        },
+        {
+          "description": "Screenshot from different browser",
+          "rationale": "Must be screenshot from Frankenstein Browser rendering"
+        }
+      ],
       "acceptance_criteria": [
-        "ACID1 test renders correctly",
+        "ACID1 test page renders correctly",
         "> 99% visual similarity with reference",
-        "Test automated in CI"
+        "Test automated in CI pipeline",
+        "Screenshot comparison documented"
       ],
       "started_at": null,
       "completed_at": null,
       "completion_method": null,
-      "reconciliation_notes": "BLOCKED: ACID1 test needs screenshot from running browser - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available)"
+      "reconciliation_notes": "BLOCKED: ACID1 test needs screenshot from running browser - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available)",
+      "enriched_by_llm": true
     },
     {
       "id": "FEAT-028",
       "name": "Performance benchmarks",
       "description": "Implement performance benchmarking using criterion crate",
+      "type": "quality",
       "status": "incomplete",
       "phase": "Week 3",
       "priority": "low",
@@ -924,8 +1153,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Performance Benchmarks",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 709,
+        "verbatim": "Performance Benchmarks"
+      },
       "dependencies": [
         "FEAT-025"
       ],
@@ -944,6 +1176,7 @@
       "id": "FEAT-029",
       "name": "Test result tracking database",
       "description": "Implement SQLite database for storing test results and performance metrics",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 3",
       "priority": "low",
@@ -953,8 +1186,11 @@
       "template_name": "Database ORM and Query Abstraction",
       "difficulty": "easy",
       "estimated_loc": "500-1000",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Test Result Tracking",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 793,
+        "verbatim": "Test Result Tracking"
+      },
       "dependencies": [
         "FEAT-020"
       ],
@@ -972,6 +1208,7 @@
       "id": "FEAT-030",
       "name": "Basic navigation validation - google.com",
       "description": "Validate browser can navigate to and display google.com correctly",
+      "type": "compliance",
       "status": "incomplete",
       "phase": "Week 3",
       "priority": "high",
@@ -979,12 +1216,28 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Success Criteria",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 928,
+        "verbatim": "Basic Navigation: Browser can load and display google.com"
+      },
       "dependencies": [
         "FEAT-019",
         "FEAT-014"
       ],
+      "verification": {
+        "method": "functional_test",
+        "threshold": {
+          "metric": "page_loads",
+          "value": 1.0,
+          "operator": "=="
+        },
+        "evidence_required": [
+          "Screenshot of google.com rendered",
+          "Page title verification",
+          "Network request log showing successful load"
+        ]
+      },
       "acceptance_criteria": [
         "Navigate to https://www.google.com",
         "Page loads successfully",
@@ -1000,6 +1253,7 @@
       "id": "FEAT-031",
       "name": "Performance target - page load under 3 seconds",
       "description": "Ensure page loads complete within 3 seconds on broadband connection",
+      "type": "performance",
       "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
@@ -1007,12 +1261,29 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Success Criteria",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 933,
+        "verbatim": "Performance: Page loads within 3 seconds on broadband"
+      },
       "dependencies": [
         "FEAT-007",
         "FEAT-014"
       ],
+      "verification": {
+        "method": "benchmark",
+        "threshold": {
+          "metric": "page_load_time",
+          "value": 3000,
+          "operator": "<",
+          "unit": "ms"
+        },
+        "evidence_required": [
+          "Benchmark results showing page load times",
+          "Network conditions documentation (broadband)",
+          "Multiple page samples"
+        ]
+      },
       "acceptance_criteria": [
         "Page load time < 3 seconds",
         "Measured on broadband connection",
@@ -1021,12 +1292,14 @@
       "started_at": null,
       "completed_at": null,
       "completion_method": null,
-      "reconciliation_notes": "BLOCKED: Page load performance needs running browser - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available)"
+      "reconciliation_notes": "BLOCKED: Page load performance needs running browser - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available)",
+      "enriched_by_llm": true
     },
     {
       "id": "FEAT-032",
       "name": "Memory usage target - under 500MB",
       "description": "Ensure browser memory usage stays under 500MB for single tab",
+      "type": "constraint",
       "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
@@ -1034,11 +1307,28 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Success Criteria",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 939,
+        "verbatim": "Memory Usage: < 500MB for single tab"
+      },
       "dependencies": [
         "FEAT-025"
       ],
+      "verification": {
+        "method": "resource_monitoring",
+        "threshold": {
+          "metric": "memory_usage",
+          "value": 500,
+          "operator": "<",
+          "unit": "MB"
+        },
+        "evidence_required": [
+          "Memory profiler output",
+          "Peak memory usage during typical browsing",
+          "Memory over time graph"
+        ]
+      },
       "acceptance_criteria": [
         "Single tab uses < 500MB RAM",
         "Memory tracking implemented",
@@ -1047,12 +1337,14 @@
       "started_at": null,
       "completed_at": null,
       "completion_method": null,
-      "reconciliation_notes": "BLOCKED: Memory usage needs running browser - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available)"
+      "reconciliation_notes": "BLOCKED: Memory usage needs running browser - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available)",
+      "enriched_by_llm": true
     },
     {
       "id": "FEAT-033",
       "name": "Top 10 websites validation",
-      "description": "Validate browser successfully loads top 10 websites",
+      "description": "Validate browser successfully loads top 10 websites. Must achieve 100% load success rate.",
+      "type": "compliance",
       "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
@@ -1060,10 +1352,36 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Success Criteria",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 938,
+        "verbatim": "Top 10 Websites: 100% load successfully"
+      },
       "dependencies": [
         "FEAT-030"
+      ],
+      "verification": {
+        "method": "functional_test",
+        "threshold": {
+          "metric": "load_success_rate",
+          "value": 1.0,
+          "operator": "=="
+        },
+        "evidence_required": [
+          "Screenshots of each top 10 website",
+          "Load success/failure log",
+          "Network request logs"
+        ]
+      },
+      "not_satisfied_by": [
+        {
+          "description": "Testing with mock/cached responses",
+          "rationale": "Must load actual live websites"
+        },
+        {
+          "description": "Partial page loads counted as success",
+          "rationale": "Page must fully render, not just return HTTP 200"
+        }
       ],
       "acceptance_criteria": [
         "100% of top 10 websites load",
@@ -1073,12 +1391,14 @@
       "started_at": null,
       "completed_at": null,
       "completion_method": null,
-      "reconciliation_notes": "BLOCKED: Top 10 websites needs running browser - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available)"
+      "reconciliation_notes": "BLOCKED: Top 10 websites needs running browser - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available)",
+      "enriched_by_llm": true
     },
     {
       "id": "FEAT-034",
       "name": "Stability validation - 1 hour session",
       "description": "Validate browser runs without crashes during 1-hour usage session",
+      "type": "quality",
       "status": "incomplete",
       "phase": "Week 3",
       "priority": "medium",
@@ -1086,11 +1406,27 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Success Criteria",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 934,
+        "verbatim": "Stability: No crashes during 1-hour usage session"
+      },
       "dependencies": [
         "FEAT-025"
       ],
+      "verification": {
+        "method": "stress_test",
+        "threshold": {
+          "metric": "crash_count",
+          "value": 0,
+          "operator": "=="
+        },
+        "evidence_required": [
+          "Session log showing 1 hour duration",
+          "Memory usage over time",
+          "Operation count (tabs, navigations)"
+        ]
+      },
       "acceptance_criteria": [
         "No crashes in 1-hour session",
         "Multiple tab operations",
@@ -1105,6 +1441,7 @@
       "id": "FEAT-035",
       "name": "Build system - build.rs",
       "description": "Implement build.rs for Windows resource compilation and EasyList download",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 1",
       "priority": "medium",
@@ -1112,8 +1449,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "build.rs",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 534,
+        "verbatim": "build.rs"
+      },
       "dependencies": [
         "FEAT-001"
       ],
@@ -1131,6 +1471,7 @@
       "id": "FEAT-036",
       "name": "CI/CD pipeline",
       "description": "Implement GitHub Actions workflow for unit tests, WPT tests, and performance benchmarks",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 3",
       "priority": "low",
@@ -1138,8 +1479,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Test Infrastructure Setup",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 742,
+        "verbatim": "Test Infrastructure Setup"
+      },
       "dependencies": [
         "FEAT-026",
         "FEAT-028"
@@ -1159,6 +1503,7 @@
       "id": "FEAT-037",
       "name": "Unit test suite",
       "description": "Implement comprehensive unit tests for message bus, ad blocker, HTTP client",
+      "type": "quality",
       "status": "completed",
       "phase": "Week 3",
       "priority": "high",
@@ -1166,8 +1511,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Unit Tests",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 583,
+        "verbatim": "Unit Tests"
+      },
       "dependencies": [
         "FEAT-002",
         "FEAT-007",
@@ -1188,6 +1536,7 @@
       "id": "FEAT-038",
       "name": "Integration test suite",
       "description": "Implement integration tests for browser startup and navigation flow",
+      "type": "quality",
       "status": "completed",
       "phase": "Week 3",
       "priority": "high",
@@ -1195,8 +1544,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Integration Tests",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 613,
+        "verbatim": "Integration Tests"
+      },
       "dependencies": [
         "FEAT-025"
       ],
@@ -1216,6 +1568,7 @@
       "id": "FEAT-039",
       "name": "Browser metrics collection",
       "description": "Implement BrowserMetrics struct for tracking page load time, memory usage, blocked requests",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 3",
       "priority": "low",
@@ -1223,8 +1576,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Monitoring and Metrics",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 971,
+        "verbatim": "Monitoring and Metrics"
+      },
       "dependencies": [
         "FEAT-025"
       ],
@@ -1244,6 +1600,7 @@
       "id": "FEAT-040",
       "name": "Security - HTTPS enforcement",
       "description": "Implement HTTPS enforcement with warnings for non-HTTPS content",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 3",
       "priority": "medium",
@@ -1251,8 +1608,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Security Considerations",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 1002,
+        "verbatim": "HTTPS Enforcement: Warn on non-HTTPS content"
+      },
       "dependencies": [
         "FEAT-007"
       ],
@@ -1270,6 +1630,7 @@
       "id": "FEAT-041",
       "name": "Security - CSP compliance",
       "description": "Implement Content Security Policy header handling and enforcement",
+      "type": "feature",
       "status": "completed",
       "phase": "Week 3",
       "priority": "low",
@@ -1277,8 +1638,11 @@
       "detected_language": "Rust",
       "template_id": null,
       "template_name": "No template match",
-      "source_file": "specifications/frankenstein-browser-specification.md",
-      "source_section": "Security Considerations",
+      "source": {
+        "file": "specifications/frankenstein-browser-specification.md",
+        "line": 1003,
+        "verbatim": "CSP Respect: Honor Content Security Policy headers"
+      },
       "dependencies": [
         "FEAT-007",
         "FEAT-014"
@@ -1329,7 +1693,7 @@
     "FEAT-029",
     "FEAT-039"
   ],
-  "last_updated": "2025-11-25T07:16:16.129929Z",
+  "last_updated": "2025-11-26T12:00:00.000000Z",
   "initialized": true,
   "spec_file": "specifications/frankenstein-browser-specification.md",
   "spec_files": [
@@ -1337,11 +1701,25 @@
   ],
   "total_features": 41,
   "detected_language": "Rust",
+  "extraction_version": "1.16.0",
   "reset": {
     "timestamp": "2025-11-24T00:15:00.000000Z",
     "tasks_reset": 41,
     "previous_completed": 41,
     "method": "/orch-reconcile-queue --reset",
     "reason": "Complete re-verification requested"
+  },
+  "requirement_summary": {
+    "by_type": {
+      "feature": 27,
+      "compliance": 6,
+      "performance": 1,
+      "constraint": 1,
+      "quality": 5,
+      "integration": 1
+    },
+    "compliance_with_anti_bypass": 5,
+    "external_references_resolved": 4,
+    "acronyms_expanded": ["WPT", "ACID", "CSP", "HTTP", "HTTPS", "IPC", "DOM", "CSS"]
   }
 }
