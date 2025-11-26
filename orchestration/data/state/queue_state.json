@@ -1247,7 +1247,7 @@
       "started_at": null,
       "completed_at": null,
       "completion_method": null,
-      "reconciliation_notes": "BLOCKED BY GUI: BLOCKED: google.com validation needs running browser - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available) Requires: libgtk-3-dev, libwebkit2gtk-4.1-dev. All headless-testable components verified."
+      "reconciliation_notes": "PARTIAL: HTTP connectivity to google.com verified via headless test (test_feat_030_http_connectivity_google). Full GUI navigation validation requires libgtk-3-dev, libwebkit2gtk-4.1-dev."
     },
     {
       "id": "FEAT-031",
@@ -1391,7 +1391,7 @@
       "started_at": null,
       "completed_at": null,
       "completion_method": null,
-      "reconciliation_notes": "BLOCKED BY GUI: BLOCKED: Top 10 websites needs running browser - Requires GUI mode (libgtk-3-dev, libwebkit2gtk-4.1-dev not available) Requires: libgtk-3-dev, libwebkit2gtk-4.1-dev. All headless-testable components verified.",
+      "reconciliation_notes": "PARTIAL: HTTP connectivity to top sites verified via headless test (test_feat_033_http_connectivity_top_10_sites: google, youtube, wikipedia, reddit). Full GUI rendering validation requires libgtk-3-dev, libwebkit2gtk-4.1-dev.",
       "enriched_by_llm": true
     },
     {
@@ -1693,7 +1693,7 @@
     "FEAT-040",
     "FEAT-041"
   ],
-  "last_updated": "2025-11-26T08:41:57.147986Z",
+  "last_updated": "2025-11-26T08:45:25.500952Z",
   "initialized": true,
   "spec_file": "specifications/frankenstein-browser-specification.md",
   "spec_files": [
