@@ -57,7 +57,8 @@ impl LinuxWebView {
     /// # Example
     ///
     /// ```no_run
-    /// use webview_integration::platform::{WebViewConfig, LinuxWebView};
+    /// use webview_integration::platform::linux::LinuxWebView;
+    /// use webview_integration::platform::WebViewConfig;
     ///
     /// let config = WebViewConfig::new()
     ///     .with_javascript(true)
@@ -200,7 +201,8 @@ impl LinuxWebView {
     /// # Example
     ///
     /// ```no_run
-    /// # use webview_integration::platform::{WebViewConfig, LinuxWebView};
+    /// # use webview_integration::platform::linux::LinuxWebView;
+    /// # use webview_integration::platform::WebViewConfig;
     /// # let config = WebViewConfig::new();
     /// # let mut webview = LinuxWebView::new(config).unwrap();
     /// webview.navigate("https://example.com").unwrap();
@@ -255,9 +257,10 @@ impl LinuxWebView {
     /// # Example
     ///
     /// ```no_run
-    /// # use webview_integration::platform::{WebViewConfig, LinuxWebView};
+    /// # use webview_integration::platform::linux::LinuxWebView;
+    /// # use webview_integration::platform::WebViewConfig;
     /// # let config = WebViewConfig::new();
-    /// # let mut webview = LinuxWebView::new(config).unwrap();
+    /// # let webview = LinuxWebView::new(config).unwrap();
     /// webview.execute_script("console.log('Hello from Rust!')").unwrap();
     /// ```
     pub fn execute_script(&self, script: &str) -> Result<String> {

@@ -243,4 +243,69 @@ impl AdBlockEngine {
 
         selectors
     }
+
+    /// Generate CSS stylesheet for element hiding
+    ///
+    /// This method generates a complete CSS stylesheet that can be injected
+    /// into a page to hide ad elements. The CSS uses `display: none !important`
+    /// to hide all matching elements.
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - The URL to generate CSS for
+    ///
+    /// # Returns
+    ///
+    /// Returns a CSS stylesheet string, or None if no selectors apply.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// if let Some(css) = engine.get_element_hider_css("https://example.com") {
+    ///     // Inject CSS into page
+    ///     webview.inject_css(&css);
+    /// }
+    /// ```
+    pub fn get_element_hider_css(&self, url: &str) -> Option<String> {
+        let selectors = self.get_cosmetic_filters(url);
+
+        if selectors.is_empty() {
+            return None;
+        }
+
+        // Join selectors with comma and apply display: none
+        // Limit selectors per rule for browser compatibility
+        // Most browsers handle ~4096 selectors per rule well
+        const SELECTORS_PER_RULE: usize = 1000;
+
+        let mut css_rules = Vec::new();
+
+        for chunk in selectors.chunks(SELECTORS_PER_RULE) {
+            let rule = format!(
+                "{} {{ display: none !important; }}",
+                chunk.join(", ")
+            );
+            css_rules.push(rule);
+        }
+
+        Some(css_rules.join("\n"))
+    }
+
+    /// Generate a style tag with element hiding CSS
+    ///
+    /// This is a convenience method that wraps the CSS in a style tag
+    /// for direct injection into HTML.
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - The URL to generate CSS for
+    ///
+    /// # Returns
+    ///
+    /// Returns a complete `<style>` tag string, or None if no selectors apply.
+    pub fn get_element_hider_style_tag(&self, url: &str) -> Option<String> {
+        self.get_element_hider_css(url).map(|css| {
+            format!("<style id=\"adblock-element-hider\">{}</style>", css)
+        })
+    }
 }

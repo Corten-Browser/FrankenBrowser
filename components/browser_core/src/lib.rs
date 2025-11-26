@@ -57,7 +57,10 @@ pub mod types;
 // Re-export main types for convenience
 pub use errors::{Error, Result};
 pub use navigation::{NavigationError, NavigationState, Navigator, Protocol};
-pub use types::{Bookmark, BrowserEngine, HistoryEntry};
+pub use types::{
+    Bookmark, BrowserEngine, BrowserMetrics, HistoryEntry, MetricsSnapshot, PerformanceMetric,
+    TestResult, TestResultDatabase, TestStatus, TestSummary,
+};
 
 #[cfg(test)]
 mod tests {
